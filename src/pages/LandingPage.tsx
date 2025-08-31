@@ -1,40 +1,62 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GraduationCap, Users, BookOpen, BarChart3, Shield, Zap } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  GraduationCap,
+  Users,
+  BookOpen,
+  BarChart3,
+  Shield,
+  Zap,
+} from 'lucide-react';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { useModalStore } from '@/lib/modalStore';
 
 const LandingPage = () => {
+  const { authModal, openAuthModal, closeAuthModal } = useModalStore();
+
   const features = [
     {
       icon: Users,
       title: 'User Management',
-      description: 'Efficiently manage teachers and staff with role-based access control.'
+      description:
+        'Efficiently manage teachers and staff with role-based access control.',
     },
     {
       icon: BookOpen,
       title: 'Student Records',
-      description: 'Maintain comprehensive student profiles with academic and personal data.'
+      description:
+        'Maintain comprehensive student profiles with academic and personal data.',
     },
     {
       icon: BarChart3,
       title: 'Analytics Dashboard',
-      description: 'Get insights into school performance with detailed analytics and reports.'
+      description:
+        'Get insights into school performance with detailed analytics and reports.',
     },
     {
       icon: Shield,
       title: 'Secure & Reliable',
-      description: 'Enterprise-grade security to keep your school data safe and protected.'
+      description:
+        'Enterprise-grade security to keep your school data safe and protected.',
     },
     {
       icon: Zap,
       title: 'Easy Integration',
-      description: 'Seamlessly integrate with existing school systems and workflows.'
+      description:
+        'Seamlessly integrate with existing school systems and workflows.',
     },
     {
       icon: GraduationCap,
       title: 'Academic Excellence',
-      description: 'Tools designed to promote and track academic achievement.'
-    }
+      description: 'Tools designed to promote and track academic achievement.',
+    },
   ];
 
   return (
@@ -48,11 +70,13 @@ const LandingPage = () => {
               <span className="text-2xl font-bold hero-text">Aura Academy</span>
             </div>
             <div className="flex gap-3">
-              <Button variant="ghost" asChild>
-                <Link to="/login">Login</Link>
+              <Button variant="ghost" onClick={() => openAuthModal('login')}>
+                Login
               </Button>
-              <Button variant="gradient" asChild>
-                <Link to="/signup">Get Started</Link>
+              <Button
+                variant="gradient"
+                onClick={() => openAuthModal('signup')}>
+                Get Started
               </Button>
             </div>
           </div>
@@ -68,15 +92,22 @@ const LandingPage = () => {
             Made Simple
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Streamline your educational institution with our comprehensive school management system. 
-            From student records to staff management, we've got you covered.
+            Streamline your educational institution with our comprehensive
+            school management system. From student records to staff management,
+            we've got you covered.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="gradient" asChild>
-              <Link to="/signup">Start Your Journey</Link>
+            <Button
+              size="lg"
+              variant="gradient"
+              onClick={() => openAuthModal('signup')}>
+              Start Your Journey
             </Button>
-            <Button size="lg" variant="gradient-outline" asChild>
-              <Link to="/login">Already Have Account?</Link>
+            <Button
+              size="lg"
+              variant="gradient-outline"
+              onClick={() => openAuthModal('login')}>
+              Already Have Account?
             </Button>
           </div>
         </div>
@@ -90,13 +121,16 @@ const LandingPage = () => {
               Everything You Need
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Powerful tools designed specifically for modern educational institutions
+              Powerful tools designed specifically for modern educational
+              institutions
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="shadow-elegant border-purple-primary/20 hover:shadow-purple transition-all duration-300">
+              <Card
+                key={index}
+                className="shadow-elegant border-purple-primary/20 hover:shadow-purple transition-all duration-300">
                 <CardHeader>
                   <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-white" />
@@ -121,9 +155,14 @@ const LandingPage = () => {
             Ready to Transform Your School?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join hundreds of schools already using Aura Academy to streamline their operations
+            Join hundreds of schools already using Aura Academy to streamline
+            their operations
           </p>
-          <Button size="lg" variant="outline" className="bg-white text-purple-primary hover:bg-white/90" asChild>
+          <Button
+            size="lg"
+            variant="outline"
+            className="bg-white text-purple-primary hover:bg-white/90"
+            asChild>
             <Link to="/signup">Start Free Trial</Link>
           </Button>
         </div>
@@ -141,6 +180,9 @@ const LandingPage = () => {
           </p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      {authModal && <AuthModal type={authModal} onClose={closeAuthModal} />}
     </div>
   );
 };
