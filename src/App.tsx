@@ -5,17 +5,30 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Suspense, lazy } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Pages
-import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import Students from "./pages/Students";
-import Teachers from "./pages/Teachers";
-import NotFound from "./pages/NotFound";
+// Lazy loaded components
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Students = lazy(() => import("./pages/Students"));
+const Teachers = lazy(() => import("./pages/Teachers"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Auth modals (non-lazy since they're small)
+import { AuthModal } from "@/components/auth/AuthModal";
 
 const queryClient = new QueryClient();
+
+// Loading component with full screen skeleton
+const PageSkeleton = () => (
+  <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+    <div className="text-center space-y-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-primary mx-auto"></div>
+      <Skeleton className="h-4 w-32 mx-auto" />
+    </div>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,43 +37,58 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            
-            {/* Protected Routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/dashboard/students" element={
-              <ProtectedRoute>
-                <Students />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/dashboard/teachers" element={
-              <ProtectedRoute requireRole="ADMIN">
-                <Teachers />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/*" element={
-              <ProtectedRoute requireRole="ADMIN">
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* Redirects */}
-            <Route path="/index" element={<Navigate to="/" replace />} />
-            
-            {/* Catch All */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
+              
+              {/* Auth Modal Routes */}
+              <Route path="/login" element={
+                <>
+                  <LandingPage />
+                  <AuthModal type="login" />
+                </>
+              } />
+              
+              <Route path="/signup" element={
+                <>
+                  <LandingPage />
+                  <AuthModal type="signup" />
+                </>
+              } />
+              
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/students" element={
+                <ProtectedRoute>
+                  <Students />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/teachers" element={
+                <ProtectedRoute requireRole="ADMIN">
+                  <Teachers />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/admin/*" element={
+                <ProtectedRoute requireRole="ADMIN">
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Redirects */}
+              <Route path="/index" element={<Navigate to="/" replace />} />
+              
+              {/* Catch All */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

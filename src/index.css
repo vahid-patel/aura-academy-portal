@@ -160,4 +160,16 @@ All colors MUST be HSL.
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+  
+  /* Modal backdrop blur styles */
+  .backdrop-blur-modal {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  /* Prevent scroll when modal is open */
+  body.modal-open {
+    overflow: hidden;
+    height: 100vh;
+  }
 }
