@@ -69,7 +69,6 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
       onOpenChange(false);
       onSchoolCreated?.();
     } catch (error: any) {
-      console.error('Error creating school:', error);
       toast({
         title: 'Error',
         description: error.response?.data?.message || 'Failed to create school',

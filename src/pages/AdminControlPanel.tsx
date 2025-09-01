@@ -47,12 +47,15 @@ const AdminControlPanel = () => {
     try {
       setIsLoading(true);
       const response = await schoolAPI.getSchools();
-      setSchools(response.data.data);
+      setSchools(response.data.data || []);
     } catch (error: any) {
-      console.error('Error fetching schools:', error);
+      if (error.response?.status === 404) {
+        setSchools([]);
+        return;
+      }
       toast({
         title: 'Error',
-        description: 'Failed to load schools',
+        description: error.response?.data?.message || 'Failed to load schools',
         variant: 'destructive',
       });
     } finally {
@@ -106,8 +109,7 @@ const AdminControlPanel = () => {
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[status]}`}
-      >
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[status]}`}>
         {status}
       </span>
     );
@@ -149,8 +151,7 @@ const AdminControlPanel = () => {
                 variant="ghost"
                 size="icon"
                 onClick={logout}
-                className="text-muted-foreground hover:text-destructive"
-              >
+                className="text-muted-foreground hover:text-destructive">
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -179,8 +180,7 @@ const AdminControlPanel = () => {
               <Button
                 variant="gradient"
                 onClick={() => setIsCreateModalOpen(true)}
-                className="gap-2"
-              >
+                className="gap-2">
                 <Plus className="h-4 w-4" />
                 Add School
               </Button>
@@ -201,8 +201,7 @@ const AdminControlPanel = () => {
                 <Button
                   variant="gradient"
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="gap-2"
-                >
+                  className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add Your First School
                 </Button>
@@ -257,16 +256,14 @@ const AdminControlPanel = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-purple-primary"
-                            >
+                              className="h-8 w-8 text-muted-foreground hover:text-purple-primary">
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                              onClick={() => handleDeleteSchool(school._id)}
-                            >
+                              onClick={() => handleDeleteSchool(school._id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
