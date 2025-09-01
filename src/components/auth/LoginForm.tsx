@@ -34,7 +34,8 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
 
     setLoading(true);
     try {
-      await login(email, password);
+      const response = await login(email, password);
+      localStorage.setItem("user", JSON.stringify(response?.data))
       toast({
         title: "Success",
         description: "Logged in successfully!",

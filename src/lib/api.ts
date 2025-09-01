@@ -25,4 +25,20 @@ export const authAPI = {
     api.post('/auth/register', { email, password, name }),
 };
 
+export const schoolAPI = {
+  getSchools: () => api.get('/school'),
+  
+  createSchool: (schoolData: any) => 
+    api.post('/school', schoolData),
+  
+  updateSchool: (id: string, schoolData: any) => 
+    api.patch(`/school/${id}`, schoolData),
+  
+  deleteSchool: (id: string) => 
+    api.delete(`/school/${id}`),
+  
+  getSchoolById: (id: string) => 
+    api.get(`/school/${id}`),
+};
+
 export default api;

@@ -13,6 +13,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Students = lazy(() => import('./pages/Students'));
 const Teachers = lazy(() => import('./pages/Teachers'));
+const AdminControlPanel = lazy(() => import('./pages/AdminControlPanel'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Auth modals (non-lazy since they're small)
@@ -66,6 +67,15 @@ const App = () => (
                 element={
                   <ProtectedRoute requireRole="ADMIN">
                     <Teachers />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/control-panel"
+                element={
+                  <ProtectedRoute >
+                    <AdminControlPanel />
                   </ProtectedRoute>
                 }
               />

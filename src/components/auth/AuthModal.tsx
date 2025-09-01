@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { GraduationCap } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
+import { useModalStore } from '@/lib/modalStore';
 
 interface AuthModalProps {
   type: 'login' | 'signup';
@@ -13,7 +14,8 @@ interface AuthModalProps {
 export const AuthModal = ({ type, onClose }: AuthModalProps) => {
   const [open, setOpen] = useState(true);
   const location = useLocation();
-  const navigate = useNavigate(); // ✅ missing before
+  const navigate = useNavigate();
+  const { openAuthModal } = useModalStore();
 
   useEffect(() => {
     // Prevent body scroll when modal is open
@@ -52,16 +54,12 @@ export const AuthModal = ({ type, onClose }: AuthModalProps) => {
           {type === 'login' ? (
             <LoginForm
               onSuccess={handleSuccess}
-              onSwitchToSignup={() =>
-                navigate('/signup', { state: location.state })
-              }
+              onSwitchToSignup={() => openAuthModal('signup')}
             />
           ) : (
             <SignupForm
               onSuccess={handleSuccess}
-              onSwitchToLogin={() =>
-                navigate('/login', { state: location.state })
-              }
+              onSwitchToLogin={() => openAuthModal('login')}
             />
           )}
         </DialogContent>

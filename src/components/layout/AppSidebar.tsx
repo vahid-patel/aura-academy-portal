@@ -33,52 +33,59 @@ export function AppSidebar() {
     navigate('/');
   };
 
+  // Crisp active/inactive styles
   const getNavClassName = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
       isActive
-        ? 'bg-white/20 text-white font-medium shadow-lg'
-        : 'text-white/80 hover:bg-white/10 hover:text-white'
+        ? 'bg-indigo-600 text-white font-medium shadow-md'
+        : 'text-gray-200 hover:bg-indigo-500 hover:text-white'
     }`;
 
   return (
-    <Sidebar className={`${isCollapsed ? 'w-14' : 'w-60'} sidebar-gradient border-r border-purple-primary/20`}>
-      <SidebarTrigger className="m-2 self-end text-white hover:bg-white/10" />
-      
+    <Sidebar
+      className={`${isCollapsed ? 'w-14' : 'w-60'} 
+        bg-gradient-to-b from-purple-700 via-indigo-700 to-purple-900 
+        border-r border-purple-600 text-white`}
+    >
+      {/* Collapse Button */}
+      <SidebarTrigger className="m-2 self-end text-gray-200 hover:bg-indigo-500/50 rounded-lg p-1" />
+
       <SidebarContent className="p-4">
         {/* User Info */}
         {!isCollapsed && (
-          <div className="mb-6 p-3 rounded-lg bg-white/10">
-            <h3 className="text-white font-medium">{user?.name}</h3>
-            <p className="text-white/70 text-sm">
+          <div className="mb-6 p-3 rounded-lg bg-indigo-600/80 text-white">
+            <h3 className="font-semibold">{user?.name}</h3>
+            <p className="text-gray-200 text-sm">
               {user?.role === 'ADMIN' ? 'Principal' : 'Teacher'}
             </p>
             {user?.schoolName && (
-              <p className="text-white/60 text-xs mt-1">{user.schoolName}</p>
+              <p className="text-gray-300 text-xs mt-1">{user.schoolName}</p>
             )}
           </div>
         )}
 
+        {/* Navigation */}
         <SidebarGroup>
           {!isCollapsed && (
-            <SidebarGroupLabel className="text-white/80 text-sm font-medium mb-2">
+            <SidebarGroupLabel className="text-gray-300 text-sm font-semibold mb-2">
               Navigation
             </SidebarGroupLabel>
           )}
-          
+
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {menuItems
                 .filter(item => item.roles.includes(user?.role || 'USER'))
                 .map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavClassName}>
-                      <item.icon className="h-5 w-5" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink to={item.url} className={getNavClassName}>
+                        <item.icon className="h-5 w-5" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -88,7 +95,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className={`w-full text-white/80 hover:bg-white/10 hover:text-white ${
+            className={`w-full text-gray-200 hover:bg-red-600 hover:text-white ${
               isCollapsed ? 'px-2' : 'justify-start'
             }`}
           >

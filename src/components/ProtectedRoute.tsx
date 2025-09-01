@@ -19,8 +19,8 @@ export const ProtectedRoute = ({ children, requireRole }: ProtectedRouteProps) =
   }
 
   if (!user) {
-    // Redirect to login with the current location as state
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Redirect to landing page where they can open the auth modal
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   if (requireRole && user.role !== requireRole) {

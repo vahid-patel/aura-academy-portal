@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -162,8 +161,8 @@ const LandingPage = () => {
             size="lg"
             variant="outline"
             className="bg-white text-purple-primary hover:bg-white/90"
-            asChild>
-            <Link to="/signup">Start Free Trial</Link>
+            onClick={() => openAuthModal('signup')}>
+            Start Free Trial
           </Button>
         </div>
       </section>
