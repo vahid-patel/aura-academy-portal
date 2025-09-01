@@ -41,12 +41,24 @@ All colors MUST be HSL.
     --purple-dark: 263 70% 35%;
     --indigo-primary: 239 84% 67%;
     --indigo-dark: 239 60% 45%;
-    
+
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--purple-primary)), hsl(var(--indigo-primary)));
-    --gradient-dark: linear-gradient(135deg, hsl(var(--purple-dark)), hsl(var(--indigo-dark)));
-    --gradient-subtle: linear-gradient(145deg, hsl(262 80% 98%), hsl(239 84% 98%));
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--purple-primary)),
+      hsl(var(--indigo-primary))
+    );
+    --gradient-dark: linear-gradient(
+      135deg,
+      hsl(var(--purple-dark)),
+      hsl(var(--indigo-dark))
+    );
+    --gradient-subtle: linear-gradient(
+      145deg,
+      hsl(262 80% 98%),
+      hsl(239 84% 98%)
+    );
+
     /* Shadows */
     --shadow-purple: 0 10px 30px -10px hsl(var(--purple-primary) / 0.3);
     --shadow-indigo: 0 10px 30px -10px hsl(var(--indigo-primary) / 0.3);
@@ -101,9 +113,21 @@ All colors MUST be HSL.
     --ring: 262 80% 60%;
 
     /* Dark theme gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 80% 60%), hsl(239 84% 70%));
-    --gradient-dark: linear-gradient(135deg, hsl(263 70% 40%), hsl(239 60% 50%));
-    --gradient-subtle: linear-gradient(145deg, hsl(222.2 84% 8%), hsl(222.2 84% 12%));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(262 80% 60%),
+      hsl(239 84% 70%)
+    );
+    --gradient-dark: linear-gradient(
+      135deg,
+      hsl(263 70% 40%),
+      hsl(239 60% 50%)
+    );
+    --gradient-subtle: linear-gradient(
+      145deg,
+      hsl(222.2 84% 8%),
+      hsl(222.2 84% 12%)
+    );
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -129,44 +153,48 @@ All colors MUST be HSL.
   .gradient-primary {
     background: var(--gradient-primary);
   }
-  
+
   .gradient-dark {
     background: var(--gradient-dark);
   }
-  
+
   .gradient-subtle {
     background: var(--gradient-subtle);
   }
-  
+
   .shadow-purple {
     box-shadow: var(--shadow-purple);
   }
-  
+
   .shadow-indigo {
     box-shadow: var(--shadow-indigo);
   }
-  
+
   .shadow-elegant {
     box-shadow: var(--shadow-elegant);
   }
-  
+
   .sidebar-gradient {
-    background: linear-gradient(180deg, hsl(var(--purple-dark)), hsl(var(--indigo-dark)));
+    background: linear-gradient(
+      180deg,
+      hsl(var(--purple-dark)),
+      hsl(var(--indigo-dark))
+    );
   }
-  
+
   .hero-text {
     background: var(--gradient-primary);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  
+
   /* Modal backdrop blur styles */
   .backdrop-blur-modal {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
-  
+
   /* Prevent scroll when modal is open */
   body.modal-open {
     overflow: hidden;
