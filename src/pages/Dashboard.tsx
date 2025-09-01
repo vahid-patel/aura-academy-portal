@@ -1,157 +1,134 @@
-import { Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import {
-  Users,
-  BookOpen,
-  School,
-  TrendingUp,
-  Calendar,
-  Bell,
-} from 'lucide-react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/layout/AppSidebar';
-import { DashboardSkeleton } from '@/components/LoadingSkeleton';
+import Sidebar from '@/components/Sidebar';
+import HomeContent from '@/components/HomeContent';
+import { School } from '@/types/school';
+import { Student } from '@/types/student';
+import { Teacher } from '@/types/teacher';
+import { schoolAPI, studentAPI, teacherAPI } from '@/lib/api';
 
-const Dashboard = () => {
-  const { user } = useAuth();
+const Dashboard: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { user, logout } = useAuth();
 
-  const stats = [
-    {
-      title: 'Total Students',
-      value: '1,234',
-      change: '+12%',
-      icon: Users,
-      color: 'text-blue-600',
-    },
-    {
-      title: 'Active Teachers',
-      value: '45',
-      change: '+2%',
-      icon: BookOpen,
-      color: 'text-green-600',
-    },
-    {
-      title: 'Classes',
-      value: '28',
-      change: '0%',
-      icon: School,
-      color: 'text-purple-primary',
-    },
-    {
-      title: 'Average Grade',
-      value: '8.7',
-      change: '+0.3',
-      icon: TrendingUp,
-      color: 'text-indigo-primary',
-    },
-  ];
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('home');
+
+  const [school, setSchool] = useState<School | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch school data when Dashboard mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const schoolResponse = await schoolAPI.getSchoolById(id!);
+        setSchool(schoolResponse.data.data);
+        setError(null);
+      } catch (err: any) {
+        if (err.response.status === 404) {
+          setError(null);
+        } else {
+          setError(err.message || 'Failed to load data');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Fetch students and reacher when school data is available
+  useEffect(() => {
+    if (school) {
+      const fetchStudentsAndTeachers = async () => {
+        try {
+          const [studentsResponse, teachersResponse] = await Promise.all([
+            studentAPI.getStudent(school._id),
+            teacherAPI.getTeacherBySchoolId(school._id),
+          ]);
+          setStudents(studentsResponse.data.data);
+          setTeachers(teachersResponse.data.data);
+        } catch (err) {
+          console.log('Failed to load students or teachers', err);
+        }
+      };
+
+      fetchStudentsAndTeachers();
+    }
+  }, [school]);
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-subtle">
-        <Suspense
-          fallback={
-            <div className="w-60">
-              Loading...
-              <div className="sidebar-gradient h-full animate-pulse" />
-            </div>
-          }>
-          <AppSidebar />
-        </Suspense>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        onLogout={logout}
+      />
 
-        <main className="flex-1">
-          <Suspense fallback={<DashboardSkeleton />}>
-            <div className="p-6">
-              {/* Header */}
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold hero-text">
-                  Welcome back, {user?.name}!
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Here is whats happening at your school today
-                </p>
-              </div>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        {/* Topbar */}
+        <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-gray-200">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden text-gray-600 hover:text-gray-900"
+          >
+            ☰
+          </button>
+          <h1 className="text-lg font-semibold">
+            Welcome, {user?.name || 'Admin'}
+          </h1>
+        </header>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {stats.map((stat, index) => (
-                  <Card
-                    key={index}
-                    className="shadow-elegant border-purple-primary/20">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        {stat.title}
-                      </CardTitle>
-                      <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">{stat.value}</div>
-                      <p className="text-xs text-muted-foreground">
-                        <span className="text-green-600">{stat.change}</span>{' '}
-                        from last month
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+        {/* Page content */}
+        <main className="p-6 flex-1">
+          {activeTab === 'home' && (
+            <>
+              {loading ? (
+                <div className="flex items-center justify-center p-8">
+                  <div className="text-lg">Loading school data...</div>
+                </div>
+              ) : error ? (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                  <p className="font-medium">Error loading data:</p>
+                  <p>{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : school ? (
+                <HomeContent
+                  school={school}
+                  students={students}
+                  teachers={teachers}
+                />
+              ) : (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
+                  <p>No school found in database.</p>
+                  <p className="text-sm mt-1">
+                    Please contact your administrator to add school data.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Activities */}
-
-                {/* Quick Actions */}
-                <Card className="shadow-elegant border-purple-primary/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-indigo-primary" />
-                      Quick Actions
-                    </CardTitle>
-                    <CardDescription>
-                      Common tasks to get you started
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button
-                      variant="gradient-outline"
-                      className="w-full justify-start">
-                      <Users className="mr-2 h-4 w-4" />
-                      Add New Student
-                    </Button>
-                    <Button
-                      variant="gradient-outline"
-                      className="w-full justify-start">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      Create Class Schedule
-                    </Button>
-                    <Button
-                      variant="gradient-outline"
-                      className="w-full justify-start">
-                      <TrendingUp className="mr-2 h-4 w-4" />
-                      View Reports
-                    </Button>
-                    {user?.role === 'admin' && (
-                      <Button
-                        variant="gradient-outline"
-                        className="w-full justify-start">
-                        <School className="mr-2 h-4 w-4" />
-                        Manage Schools
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </Suspense>
+          {activeTab === 'students' && <div>🎓 Students content</div>}
+          {activeTab === 'teachers' && <div>👩‍🏫 Teachers content</div>}
         </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 

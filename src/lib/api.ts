@@ -38,5 +38,25 @@ export const schoolAPI = {
 
   getSchoolById: (id: string) => api.get(`/school/${id}`),
 };
+export const studentAPI = {
+  createStudent: (studentData: any) => api.post('/student', studentData),
+  getStudent: (schoolId: string) => api.get(`/student/${schoolId}`),
+  getStudentById: (id: string) => api.get(`/student/${id}`),
+  updateStudent: (id: string, studentData: any) =>
+    api.patch(`/student/${id}`, studentData),
+  deleteStudent: (id: string) => api.delete(`/student/${id}`),
+};
+
+export const teacherAPI = {
+  createTeacher: (teacherData: any) => api.post('/user', teacherData),
+
+  getTeacherBySchoolId: (schoolId: string) =>
+    api.get(`/user/teachers/${schoolId}`),
+
+  updateTeacher: (id: string, teacherData: any) =>
+    api.patch(`/user/${id}`, teacherData),
+
+  deleteTeacher: (id: string) => api.delete(`/user/${id}`),
+};
 
 export default api;

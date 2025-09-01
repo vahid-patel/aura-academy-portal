@@ -33,8 +33,10 @@ import { schoolAPI } from '@/lib/api';
 import { School as SchoolType } from '@/types/school';
 import { useToast } from '@/hooks/use-toast';
 import { WelcomeBanner } from '@/components/WelcomeBanner';
+import { useNavigate } from 'react-router-dom';
 
 const AdminControlPanel = () => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const [schools, setSchools] = useState<SchoolType[]>([]);
@@ -77,14 +79,21 @@ const AdminControlPanel = () => {
         title: 'Success',
         description: 'School deleted successfully',
       });
-      fetchSchools(); // Refresh the list
+      fetchSchools();
     } catch (error: any) {
-      console.error('Error deleting school:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete school',
-        variant: 'destructive',
-      });
+      if (error.status === 404) {
+        toast({
+          title: 'Not Found',
+          description: 'School not found or already deleted',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete school',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
@@ -216,9 +225,7 @@ const AdminControlPanel = () => {
                       <TableRow
                         key={school._id}
                         className="cursor-pointer hover:bg-purple-50"
-                        onClick={() =>
-                          console.log('Clicked school:', school._id)
-                        }
+                        onClick={() => navigate(`/dashboard/${school._id}`)}
                       >
                         <TableCell>
                           <div>

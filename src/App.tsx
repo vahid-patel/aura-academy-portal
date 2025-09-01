@@ -11,8 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 // Lazy loaded components
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Students = lazy(() => import('./pages/Students'));
-const Teachers = lazy(() => import('./pages/Teachers'));
+
 const AdminControlPanel = lazy(() => import('./pages/AdminControlPanel'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -43,28 +42,10 @@ const App = () => (
               <Route path="/" element={<LandingPage />} />
 
               <Route
-                path="/dashboard"
+                path="/dashboard/:id"
                 element={
                   <ProtectedRoute>
                     <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/dashboard/students"
-                element={
-                  <ProtectedRoute>
-                    <Students />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/dashboard/teachers"
-                element={
-                  <ProtectedRoute requireRole="admin">
-                    <Teachers />
                   </ProtectedRoute>
                 }
               />
@@ -74,15 +55,6 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <AdminControlPanel />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute requireRole="admin">
-                    <Dashboard />
                   </ProtectedRoute>
                 }
               />
