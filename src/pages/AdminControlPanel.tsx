@@ -32,6 +32,7 @@ import { CreateSchoolModal } from '@/components/admin/CreateSchoolModal';
 import { schoolAPI } from '@/lib/api';
 import { School as SchoolType } from '@/types/school';
 import { useToast } from '@/hooks/use-toast';
+import { WelcomeBanner } from '@/components/WelcomeBanner';
 
 const AdminControlPanel = () => {
   const { user, logout } = useAuth();
@@ -96,7 +97,8 @@ const AdminControlPanel = () => {
 
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[status]}`}>
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[status]}`}
+      >
         {status}
       </span>
     );
@@ -138,7 +140,8 @@ const AdminControlPanel = () => {
                 variant="ghost"
                 size="icon"
                 onClick={logout}
-                className="text-muted-foreground hover:text-destructive">
+                className="text-muted-foreground hover:text-destructive"
+              >
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -148,23 +151,7 @@ const AdminControlPanel = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-elegant border-purple-primary/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Schools
-              </CardTitle>
-              <School className="h-4 w-4 text-purple-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{schools.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Educational institutions
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <WelcomeBanner userName={user?.name || 'User'}></WelcomeBanner>
 
         {/* Schools Management */}
         <Card className="shadow-elegant border-purple-primary/20">
@@ -183,7 +170,8 @@ const AdminControlPanel = () => {
               <Button
                 variant="gradient"
                 onClick={() => setIsCreateModalOpen(true)}
-                className="gap-2">
+                className="gap-2"
+              >
                 <Plus className="h-4 w-4" />
                 Add School
               </Button>
@@ -204,7 +192,8 @@ const AdminControlPanel = () => {
                 <Button
                   variant="gradient"
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="gap-2">
+                  className="gap-2"
+                >
                   <Plus className="h-4 w-4" />
                   Add Your First School
                 </Button>
@@ -214,29 +203,26 @@ const AdminControlPanel = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>School Details</TableHead>
+                      <TableHead>School Name</TableHead>
                       <TableHead>Principal</TableHead>
                       <TableHead>Contact</TableHead>
-                      <TableHead>Stats</TableHead>
-                      <TableHead>Status</TableHead>
+
+                      <TableHead>Address</TableHead>
                       <TableHead>Created</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {schools.map((school) => (
-                      <TableRow key={school.id}>
+                      <TableRow
+                        key={school._id}
+                        className="cursor-pointer hover:bg-purple-50"
+                        onClick={() =>
+                          console.log('Clicked school:', school._id)
+                        }
+                      >
                         <TableCell>
                           <div>
                             <div className="font-medium">{school.name}</div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {school.city}, {school.state}
-                            </div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              Est. {school.establishedYear}
-                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -247,32 +233,13 @@ const AdminControlPanel = () => {
                         <TableCell>
                           <div className="space-y-1">
                             <div className="text-sm flex items-center gap-1">
-                              <Mail className="h-3 w-3" />
-                              {school.email}
-                            </div>
-                            <div className="text-sm flex items-center gap-1">
                               <Phone className="h-3 w-3" />
-                              {school.phone}
+                              {school.contactNumber}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="text-sm">
-                              <span className="font-medium">
-                                {school.studentCount}
-                              </span>{' '}
-                              students
-                            </div>
-                            <div className="text-sm">
-                              <span className="font-medium">
-                                {school.teacherCount}
-                              </span>{' '}
-                              teachers
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(school.status)}</TableCell>
+
+                        <TableCell>{school.address}</TableCell>
                         <TableCell>
                           <div className="text-sm text-muted-foreground">
                             {formatDate(school.createdAt)}
@@ -283,14 +250,16 @@ const AdminControlPanel = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-purple-primary">
+                              className="h-8 w-8 text-muted-foreground hover:text-purple-primary"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                              onClick={() => handleDeleteSchool(school.id)}>
+                              onClick={() => handleDeleteSchool(school._id)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

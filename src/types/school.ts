@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export interface School {
-  id: string;
+  _id: string;
   name: string;
   address: string;
   city: string;
@@ -17,6 +17,7 @@ export interface School {
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   createdAt: string;
   updatedAt: string;
+  contactNumber:string;
 }
 
 export const createSchoolSchema = z.object({
