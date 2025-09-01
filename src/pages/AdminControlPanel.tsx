@@ -343,6 +343,7 @@ const AdminControlPanel = () => {
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
         onSchoolCreated={fetchSchools}
+        adminId={user?.id}
       />
     </div>
   );

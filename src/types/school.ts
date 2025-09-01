@@ -1,4 +1,4 @@
-import { StringValidation } from "zod";
+import { z } from "zod";
 
 export interface School {
   id: string;
@@ -18,6 +18,14 @@ export interface School {
   createdAt: string;
   updatedAt: string;
 }
+
+export const createSchoolSchema = z.object({
+  name: z.string().min(1, "School name is required"),
+  principalName: z.string().min(1, "Principal name is required"),
+  address: z.string().optional(),
+  contactNumber: z.string().optional(),
+  isActive: z.boolean().default(true),
+});
 
 export interface CreateSchoolRequest {
   name: string;
