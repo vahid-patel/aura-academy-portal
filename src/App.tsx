@@ -40,10 +40,8 @@ const App = () => (
         <BrowserRouter>
           <Suspense fallback={<PageSkeleton />}>
             <Routes>
-              {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
 
-              {/* Protected Routes */}
               <Route
                 path="/dashboard"
                 element={
@@ -65,7 +63,7 @@ const App = () => (
               <Route
                 path="/dashboard/teachers"
                 element={
-                  <ProtectedRoute requireRole="ADMIN">
+                  <ProtectedRoute requireRole="admin">
                     <Teachers />
                   </ProtectedRoute>
                 }
@@ -74,7 +72,7 @@ const App = () => (
               <Route
                 path="/admin/control-panel"
                 element={
-                  <ProtectedRoute >
+                  <ProtectedRoute>
                     <AdminControlPanel />
                   </ProtectedRoute>
                 }
@@ -83,7 +81,7 @@ const App = () => (
               <Route
                 path="/admin/*"
                 element={
-                  <ProtectedRoute requireRole="ADMIN">
+                  <ProtectedRoute requireRole="admin">
                     <Dashboard />
                   </ProtectedRoute>
                 }

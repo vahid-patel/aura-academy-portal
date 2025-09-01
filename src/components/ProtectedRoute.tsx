@@ -3,10 +3,13 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireRole?: 'ADMIN' | 'USER';
+  requireRole?: 'admin' | 'user';
 }
 
-export const ProtectedRoute = ({ children, requireRole }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({
+  children,
+  requireRole,
+}: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -19,13 +22,16 @@ export const ProtectedRoute = ({ children, requireRole }: ProtectedRouteProps) =
   }
 
   if (!user) {
-    // Redirect to landing page where they can open the auth modal
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   if (requireRole && user.role !== requireRole) {
-    // Redirect to appropriate dashboard based on role
-    return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/dashboard'} replace />;
+    return (
+      <Navigate
+        to={user.role === 'admin' ? '/control-panel' : '/dashboard'}
+        replace
+      />
+    );
   }
 
   return <>{children}</>;

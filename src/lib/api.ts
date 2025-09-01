@@ -8,7 +8,6 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to add auth token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -26,19 +25,16 @@ export const authAPI = {
 };
 
 export const schoolAPI = {
-  getSchools: () => api.get('/school'),
-  
-  createSchool: (schoolData: any) => 
-    api.post('/school', schoolData),
-  
-  updateSchool: (id: string, schoolData: any) => 
-    api.patch(`/school/${id}`, schoolData),
-  
-  deleteSchool: (id: string) => 
-    api.delete(`/school/${id}`),
-  
-  getSchoolById: (id: string) => 
-    api.get(`/school/${id}`),
+  getSchools: () => api.get('/schools'),
+
+  createSchool: (schoolData: any) => api.post('/api/schools', schoolData),
+
+  updateSchool: (id: string, schoolData: any) =>
+    api.patch(`/api/schools/${id}`, schoolData),
+
+  deleteSchool: (id: string) => api.delete(`/api/schools/${id}`),
+
+  getSchoolById: (id: string) => api.get(`/api/schools/${id}`),
 };
 
 export default api;

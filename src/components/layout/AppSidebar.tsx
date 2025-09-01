@@ -16,9 +16,19 @@ import {
 } from '@/components/ui/sidebar';
 
 const menuItems = [
-  { title: "Home", url: "/dashboard", icon: Home, roles: ['ADMIN', 'USER'] },
-  { title: "Students", url: "/dashboard/students", icon: Users, roles: ['ADMIN', 'USER'] },
-  { title: "Teachers", url: "/dashboard/teachers", icon: UserCog, roles: ['ADMIN'] },
+  { title: 'Home', url: '/dashboard', icon: Home, roles: ['admin', 'user'] },
+  {
+    title: 'Students',
+    url: '/dashboard/students',
+    icon: Users,
+    roles: ['admin', 'user'],
+  },
+  {
+    title: 'Teachers',
+    url: '/dashboard/teachers',
+    icon: UserCog,
+    roles: ['ADMIN'],
+  },
 ];
 
 export function AppSidebar() {
@@ -26,7 +36,7 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = state === 'collapsed';
 
   const handleLogout = () => {
     logout();
@@ -45,18 +55,16 @@ export function AppSidebar() {
     <Sidebar
       className={`${isCollapsed ? 'w-14' : 'w-60'} 
         bg-gradient-to-b from-purple-700 via-indigo-700 to-purple-900 
-        border-r border-purple-600 text-white`}
-    >
+        border-r border-purple-600 text-white`}>
       {/* Collapse Button */}
       <SidebarTrigger className="m-2 self-end text-gray-200 hover:bg-indigo-500/50 rounded-lg p-1" />
 
       <SidebarContent className="p-4">
-        {/* User Info */}
         {!isCollapsed && (
           <div className="mb-6 p-3 rounded-lg bg-indigo-600/80 text-white">
             <h3 className="font-semibold">{user?.name}</h3>
             <p className="text-gray-200 text-sm">
-              {user?.role === 'ADMIN' ? 'Principal' : 'Teacher'}
+              {user?.role === 'admin' ? 'Principal' : 'teacher'}
             </p>
             {user?.schoolName && (
               <p className="text-gray-300 text-xs mt-1">{user.schoolName}</p>
@@ -68,14 +76,14 @@ export function AppSidebar() {
         <SidebarGroup>
           {!isCollapsed && (
             <SidebarGroupLabel className="text-gray-300 text-sm font-semibold mb-2">
-              Navigation
+              School
             </SidebarGroupLabel>
           )}
 
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {menuItems
-                .filter(item => item.roles.includes(user?.role || 'USER'))
+                .filter((item) => item.roles.includes(user?.role || 'user'))
                 .map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
@@ -97,8 +105,7 @@ export function AppSidebar() {
             onClick={handleLogout}
             className={`w-full text-gray-200 hover:bg-red-600 hover:text-white ${
               isCollapsed ? 'px-2' : 'justify-start'
-            }`}
-          >
+            }`}>
             <LogOut className="h-5 w-5" />
             {!isCollapsed && <span className="ml-3">Logout</span>}
           </Button>

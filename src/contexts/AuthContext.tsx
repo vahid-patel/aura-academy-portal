@@ -6,12 +6,13 @@ import {
   ReactNode,
 } from 'react';
 import { authAPI } from '../lib/api';
+import { date } from 'zod';
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'ADMIN' | 'USER';
+  role: 'admin' | 'user';
   schoolId?: string;
   schoolName?: string;
 }
@@ -63,10 +64,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (email: string, password: string) => {
     try {
       const { data } = await authAPI.login(email, password);
-      const { token, user: userData } = data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Login failed');
     }
@@ -76,7 +76,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const { data } = await authAPI.register(email, password, name);
       const { token, user: userData } = data;
-
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);

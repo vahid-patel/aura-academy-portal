@@ -163,7 +163,7 @@ const Dashboard = () => {
                       <TrendingUp className="mr-2 h-4 w-4" />
                       View Reports
                     </Button>
-                    {user?.role === 'ADMIN' && (
+                    {user?.role === 'admin' && (
                       <Button
                         variant="gradient-outline"
                         className="w-full justify-start">

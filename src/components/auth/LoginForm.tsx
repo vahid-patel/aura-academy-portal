@@ -17,7 +17,7 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const { toast } = useToast();
 
@@ -25,27 +25,26 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
     e.preventDefault();
     if (!email || !password) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please fill in all fields',
+        variant: 'destructive',
       });
       return;
     }
 
     setLoading(true);
     try {
-      const response = await login(email, password);
-      localStorage.setItem("user", JSON.stringify(response?.data))
+      await login(email, password);
       toast({
-        title: "Success",
-        description: "Logged in successfully!",
+        title: 'Success',
+        description: 'Logged in successfully!',
       });
       onSuccess();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -93,13 +92,13 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
             autoFocus
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Input
               id="password"
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -110,8 +109,7 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
               variant="ghost"
               size="icon"
               className="absolute right-0 top-0 h-full px-3"
-              onClick={() => setShowPassword(!showPassword)}
-            >
+              onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
               ) : (
@@ -121,12 +119,11 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
           </div>
         </div>
 
-        <Button 
-          type="submit" 
-          variant="gradient" 
-          className="w-full" 
-          disabled={loading}
-        >
+        <Button
+          type="submit"
+          variant="gradient"
+          className="w-full"
+          disabled={loading}>
           <LogIn className="h-4 w-4 mr-2" />
           Sign In
         </Button>
@@ -135,10 +132,9 @@ export const LoginForm = ({ onSuccess, onSwitchToSignup }: LoginFormProps) => {
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{' '}
-          <button 
+          <button
             onClick={onSwitchToSignup}
-            className="font-medium text-purple-primary hover:underline"
-          >
+            className="font-medium text-purple-primary hover:underline">
             Sign up
           </button>
         </p>
