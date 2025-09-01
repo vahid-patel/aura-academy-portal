@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export interface School {
   id: string;
@@ -20,8 +20,9 @@ export interface School {
 }
 
 export const createSchoolSchema = z.object({
-  name: z.string().min(1, "School name is required"),
-  principalName: z.string().min(1, "Principal name is required"),
+  name: z.string().min(1, 'School name is required'),
+  principalName: z.string().min(1, 'Principal name is required'),
+  adminId: z.string().min(1, 'Admin ID is required'),
   address: z.string().optional(),
   contactNumber: z.string().optional(),
   isActive: z.boolean().default(true),

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -17,22 +17,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { schoolAPI } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { createSchoolSchema }  from '@/types/school'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { schoolAPI } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
+import { createSchoolSchema } from '@/types/school';
 
 // ✅ Schema aligned with backend
-type CreateSchoolFormData = z.infer<typeof createSchoolSchema>;
+export type CreateSchoolFormData = z.infer<typeof createSchoolSchema>;
 
 interface CreateSchoolModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSchoolCreated?: () => void;
-  adminId: string; // required, should come from logged-in user
+  adminId: string;
 }
 
 export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
@@ -47,37 +47,33 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
   const form = useForm<CreateSchoolFormData>({
     resolver: zodResolver(createSchoolSchema),
     defaultValues: {
-      name: "",
-      principalName: "",
-      address: "",
-      contactNumber: "",
+      name: '',
+      principalName: '',
+      address: '',
+      contactNumber: '',
       isActive: true,
+      adminId: adminId,
     },
   });
 
   const onSubmit = async (data: CreateSchoolFormData) => {
     setIsSubmitting(true);
     try {
-      await schoolAPI.createSchool({
-        ...data,
-        adminId, // automatically added
-      });
-
+      await schoolAPI.createSchool(data);
       toast({
-        title: "Success",
-        description: "School created successfully!",
+        title: 'Success',
+        description: 'School created successfully!',
       });
 
       form.reset();
       onOpenChange(false);
       onSchoolCreated?.();
     } catch (error: any) {
-      console.error("Error creating school:", error);
+      console.error('Error creating school:', error);
       toast({
-        title: "Error",
-        description:
-          error.response?.data?.message || "Failed to create school",
-        variant: "destructive",
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to create school',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -178,12 +174,11 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                disabled={isSubmitting}
-              >
+                disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button type="submit" variant="gradient" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create School"}
+                {isSubmitting ? 'Creating...' : 'Create School'}
               </Button>
             </DialogFooter>
           </form>

@@ -54,33 +54,6 @@ const Dashboard = () => {
     },
   ];
 
-  const recentActivities = [
-    {
-      action: 'New student enrolled',
-      details: 'John Doe joined Grade 10A',
-      time: '2 hours ago',
-      type: 'enrollment',
-    },
-    {
-      action: 'Grade report submitted',
-      details: 'Mathematics - Grade 9B',
-      time: '4 hours ago',
-      type: 'grade',
-    },
-    {
-      action: 'Parent meeting scheduled',
-      details: "Emma Wilson's parents",
-      time: '6 hours ago',
-      type: 'meeting',
-    },
-    {
-      action: 'Attendance updated',
-      details: 'Grade 8C - 95% present',
-      time: '1 day ago',
-      type: 'attendance',
-    },
-  ];
-
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-subtle">
@@ -103,7 +76,7 @@ const Dashboard = () => {
                   Welcome back, {user?.name}!
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Here's what's happening at your school today
+                  Here is whats happening at your school today
                 </p>
               </div>
 

@@ -1,3 +1,4 @@
+import { CreateSchoolFormData } from '@/components/admin/CreateSchoolModal';
 import axios from 'axios';
 
 // Create axios instance with default config
@@ -25,16 +26,17 @@ export const authAPI = {
 };
 
 export const schoolAPI = {
-  getSchools: () => api.get('/schools'),
+  getSchools: () => api.get('/school'),
 
-  createSchool: (schoolData: any) => api.post('/api/schools', schoolData),
+  createSchool: (schoolData: CreateSchoolFormData) =>
+    api.post('/school', schoolData),
 
   updateSchool: (id: string, schoolData: any) =>
-    api.patch(`/api/schools/${id}`, schoolData),
+    api.patch(`/school/${id}`, schoolData),
 
-  deleteSchool: (id: string) => api.delete(`/api/schools/${id}`),
+  deleteSchool: (id: string) => api.delete(`/school/${id}`),
 
-  getSchoolById: (id: string) => api.get(`/api/schools/${id}`),
+  getSchoolById: (id: string) => api.get(`/school/${id}`),
 };
 
 export default api;
