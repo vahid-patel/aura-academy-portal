@@ -40,7 +40,12 @@ export const schoolAPI = {
 };
 export const studentAPI = {
   createStudent: (studentData: any) => api.post('/student', studentData),
-  getStudent: (schoolId: string) => api.get(`/student/${schoolId}`),
+  uploadCSV: (formData: any) =>
+    api.post('/student/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  getStudent: (schoolId: string, page: number) =>
+    api.get(`/student/${schoolId}?page=${page}`),
   getStudentById: (id: string) => api.get(`/student/${id}`),
   updateStudent: (id: string, studentData: any) =>
     api.patch(`/student/${id}`, studentData),

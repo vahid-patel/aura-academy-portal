@@ -35,7 +35,7 @@ export default function StatsOverview({
           <div>
             <p className="text-sm font-medium text-gray-600">Total Teachers</p>
             <p className="text-3xl font-bold text-gray-900">
-              {teachers.length}
+              {teachers?.length}
             </p>
           </div>
           <div className="bg-purple-50 p-3 rounded-full">

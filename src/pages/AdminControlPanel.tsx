@@ -223,10 +223,10 @@ const AdminControlPanel = () => {
                     {schools.map((school) => (
                       <TableRow
                         key={school._id}
-                        className="cursor-pointer hover:bg-purple-50"
-                        onClick={() => navigate(`/dashboard/${school._id}`)}
+                        
+                        
                       >
-                        <TableCell>
+                        <TableCell className="cursor-pointer hover:bg-purple-50" onClick={() => navigate(`/dashboard/${school._id}`)}>
                           <div>
                             <div className="font-medium">{school.name}</div>
                           </div>

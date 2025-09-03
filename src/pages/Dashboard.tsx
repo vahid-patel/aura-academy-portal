@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/Sidebar';
@@ -7,6 +7,7 @@ import { School } from '@/types/school';
 import { Student } from '@/types/student';
 import { Teacher } from '@/types/teacher';
 import { schoolAPI, studentAPI, teacherAPI } from '@/lib/api';
+import Students from '@/components/student/Students';
 
 const Dashboard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,8 +21,8 @@ const Dashboard: React.FC = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentStudentPage, setCurrentStudentPage] = useState(1);
 
-  // Fetch school data when Dashboard mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,22 +46,82 @@ const Dashboard: React.FC = () => {
   // Fetch students and reacher when school data is available
   useEffect(() => {
     if (school) {
-      const fetchStudentsAndTeachers = async () => {
+      const fetchStudent = async () => {
         try {
-          const [studentsResponse, teachersResponse] = await Promise.all([
-            studentAPI.getStudent(school._id),
-            teacherAPI.getTeacherBySchoolId(school._id),
-          ]);
+          console.log(`/student/${school._id}?page=${currentStudentPage}`);
+          const studentsResponse = await studentAPI.getStudent(
+            school._id,
+            currentStudentPage
+          );
+          console.log('Fetched students:', studentsResponse);
           setStudents(studentsResponse.data.data);
-          setTeachers(teachersResponse.data.data);
         } catch (err) {
-          console.log('Failed to load students or teachers', err);
+          if (err.response && err.response.status === 404) {
+            setStudents([]);
+          } else {
+            console.log('Failed to load students', err);
+            setError(err?.message || 'Failed to load students');
+          }
         }
       };
-
-      fetchStudentsAndTeachers();
+      const fetchTeacher = async () => {
+        try {
+          const teachersResponse = await teacherAPI.getTeacherBySchoolId(
+            school._id
+          );
+          setTeachers(teachersResponse.data.data);
+        } catch (err) {
+          if (err.response && err.response.status === 404) {
+            setTeachers([]);
+          } else {
+            console.log('Failed to load teachers', err);
+            setError(err?.message || 'Failed to load teachers');
+          }
+        }
+      };
+      fetchStudent();
+      fetchTeacher();
     }
   }, [school]);
+
+  // Fetch students and teachers
+  const refreshData = useCallback(async () => {
+    if (!school) return;
+    try {
+      setLoading(true);
+      const studentsResponse = await studentAPI.getStudent(
+        school._id,
+        currentStudentPage
+      );
+      const teachersResponse = await teacherAPI.getTeacherBySchoolId(
+        school._id
+      );
+      setStudents(studentsResponse.data.data);
+      // setTeachers(teachersResponse.data.data);
+    } catch (err) {
+      if (err.response && err.response.status === 404) {
+        setStudents([]);
+      } else {
+        console.log('Failed to refresh data', err);
+        setError(err?.message || 'Failed to refresh data');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [school, currentStudentPage]);
+
+  // Automatically refresh data when currentStudentPage changes
+  useEffect(() => {
+    if (school) {
+      refreshData();
+    }
+  }, [currentStudentPage, refreshData, school]);
+
+  // Handle pagination change for students
+  const handleStudentPageChange = useCallback((page: number) => {
+    setCurrentStudentPage(page);
+    console.log('Students page changed to:', page);
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -124,7 +185,16 @@ const Dashboard: React.FC = () => {
             </>
           )}
 
-          {activeTab === 'students' && <div>🎓 Students content</div>}
+          {activeTab === 'students' && (
+            <Students
+              schoolId={id!}
+              students={students}
+              loading={loading}
+              error={error}
+              onRefresh={refreshData}
+              onPageChange={handleStudentPageChange}
+            />
+          )}
           {activeTab === 'teachers' && <div>👩‍🏫 Teachers content</div>}
         </main>
       </div>
