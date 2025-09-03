@@ -12,12 +12,12 @@ export interface School {
   principalName: string;
   website?: string;
   establishedYear: number;
-  studentCount: number;
-  teacherCount: number;
+  totalStudents: number;
+  totalTeachers: number;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   createdAt: string;
   updatedAt: string;
-  contactNumber:string;
+  contactNumber: string;
 }
 
 export const createSchoolSchema = z.object({

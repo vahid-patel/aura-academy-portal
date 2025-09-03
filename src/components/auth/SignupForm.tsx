@@ -17,48 +17,53 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { signup } = useAuth();
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please fill in all fields',
+        variant: 'destructive',
       });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Passwords do not match',
+        variant: 'destructive',
       });
       return;
     }
 
     if (formData.password.length < 6) {
       toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Password must be at least 6 characters long',
+        variant: 'destructive',
       });
       return;
     }
@@ -67,15 +72,15 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
     try {
       await signup(formData.email, formData.password, formData.name);
       toast({
-        title: "Success",
-        description: "Account created successfully!",
+        title: 'Success',
+        description: 'Account created successfully!',
       });
       onSuccess();
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -114,7 +119,7 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Create Account</h2>
         <p className="text-muted-foreground">
-          Join Aura Academy and start managing your school efficiently
+          Join Edu management and start managing your school efficiently
         </p>
       </div>
 
@@ -145,14 +150,14 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
             className="border-purple-primary/30 focus:border-purple-primary"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Input
               id="password"
               name="password"
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Create a password"
               value={formData.password}
               onChange={handleInputChange}
@@ -163,8 +168,7 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
               variant="ghost"
               size="icon"
               className="absolute right-0 top-0 h-full px-3"
-              onClick={() => setShowPassword(!showPassword)}
-            >
+              onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
               ) : (
@@ -180,7 +184,7 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
             <Input
               id="confirmPassword"
               name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
+              type={showConfirmPassword ? 'text' : 'password'}
               placeholder="Confirm your password"
               value={formData.confirmPassword}
               onChange={handleInputChange}
@@ -191,8 +195,7 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
               variant="ghost"
               size="icon"
               className="absolute right-0 top-0 h-full px-3"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
               {showConfirmPassword ? (
                 <EyeOff className="h-4 w-4" />
               ) : (
@@ -202,12 +205,11 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
           </div>
         </div>
 
-        <Button 
-          type="submit" 
-          variant="gradient" 
-          className="w-full" 
-          disabled={loading}
-        >
+        <Button
+          type="submit"
+          variant="gradient"
+          className="w-full"
+          disabled={loading}>
           <UserPlus className="h-4 w-4 mr-2" />
           Create Account
         </Button>
@@ -216,10 +218,9 @@ export const SignupForm = ({ onSuccess, onSwitchToLogin }: SignupFormProps) => {
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{' '}
-          <button 
+          <button
             onClick={onSwitchToLogin}
-            className="font-medium text-purple-primary hover:underline"
-          >
+            className="font-medium text-purple-primary hover:underline">
             Sign in
           </button>
         </p>

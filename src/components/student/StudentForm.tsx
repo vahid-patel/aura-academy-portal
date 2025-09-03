@@ -2,11 +2,16 @@
 
 import { useState } from 'react';
 import { User, Phone, Users, BookOpen } from 'lucide-react';
-import { StudentFormData, studentSchema, Genders, Divisions } from './schema';
+import {
+  StudentFormData,
+  studentSchema,
+  Genders,
+  Divisions,
+} from '@/types/student';
 import { studentAPI as addStudent } from '@/lib/api';
 
-type Gender = (typeof Genders)[number];
-type Division = (typeof Divisions)[number];
+type Gender = typeof Genders;
+type Division = typeof Divisions;
 
 interface AddStudentFormProps {
   schoolId: string;
@@ -82,19 +87,13 @@ export default function AddStudentForm({
         rollNumber: Number(result.data.rollNumber),
         adhaar: Number(result.data.adhaar),
         grade: Number(result.data.grade),
-        gender:
-          result.data.gender === '' ? 'male' : (result.data.gender as Gender),
+        gender: result.data.gender in Genders ? result.data.gender : 'male',
         division:
-          result.data.division === ''
-            ? 'A'
-            : (result.data.division as Division),
+          result.data.division in Divisions ? result.data.division : 'A',
       };
-      console.log('calling api with data: ', parsedData);
       const response = await addStudent.createStudent(parsedData);
-      console.log('Student added:', response.data);
       onSuccess();
     } catch (err) {
-      console.log('Failed to add student:', err);
       setErrors({ submit: 'Failed to add student. Please try again.' });
     } finally {
       setLoading(false);
@@ -212,8 +211,7 @@ export default function AddStudentForm({
               name="gender"
               className={inputClass}
               value={formData.gender}
-              onChange={handleChange}
-            >
+              onChange={handleChange}>
               <option value="">Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -327,8 +325,7 @@ export default function AddStudentForm({
               name="grade"
               className={inputClass}
               value={formData.grade}
-              onChange={handleChange}
-            >
+              onChange={handleChange}>
               <option value="">Select Grade</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((_, i) => (
                 <option key={i} value={i + 1}>
@@ -345,8 +342,7 @@ export default function AddStudentForm({
               name="division"
               className={inputClass}
               value={formData.division}
-              onChange={handleChange}
-            >
+              onChange={handleChange}>
               <option value="">Select Division</option>
               {Divisions.map((division, i) => (
                 <option key={i} value={division}>
@@ -427,15 +423,13 @@ export default function AddStudentForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 transition"
-        >
+          className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 transition">
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed">
           {loading ? 'Saving...' : 'Save'}
         </button>
       </div>

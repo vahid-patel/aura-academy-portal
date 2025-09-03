@@ -9,9 +9,12 @@ import {
   Printer,
   Edit,
   Trash,
+  IdCard,
+  FileText,
 } from 'lucide-react';
 import { Student } from '@/types/student';
 import api from '@/lib/api';
+import StudentDetailFooter from './StudentDetailFooter';
 
 interface StudentDetailsProps {
   student: Student;
@@ -34,45 +37,9 @@ export default function StudentDetails({
       day: 'numeric',
     });
   };
-  const handleDelete = () => {};
-  const handlePrint = async () => {
-    if (!student?._id) {
-      console.error('Student ID is missing.');
-      alert(
-        'Could not open certificate because the student ID is not available.'
-      );
-      return;
-    }
-
-    try {
-      // Call backend to get certificate HTML
-      const response = await api.get(`/certificate/${student._id}`, {
-        responseType: 'text', // Expect raw HTML
-      });
-
-      const certificateHtml = response.data;
-
-      // Open certificate in a new tab
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-
-      if (printWindow) {
-        printWindow.document.write(certificateHtml);
-        printWindow.document.close();
-        printWindow.focus(); // Just open, no auto-print
-      } else {
-        alert('Please allow pop-ups for this website to view the certificate.');
-      }
-    } catch (error) {
-      console.error('Error opening certificate:', error);
-      alert(
-        'An error occurred while trying to open the certificate. See the console for details.'
-      );
-    }
-  };
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/10 backdrop-blur-xs z-40"
         onClick={onClose}
@@ -81,9 +48,9 @@ export default function StudentDetails({
       {/* Modal */}
       <div className="fixed inset-0 z-50 overflow-y-auto">
         <div className="flex min-h-full items-center justify-center p-4">
-          <div className="relative bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+          <div className="relative bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[85vh] flex flex-col">
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 text-white">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 text-white flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="bg-white/20 p-2 rounded-lg">
@@ -100,12 +67,6 @@ export default function StudentDetails({
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={handlePrint}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                    title="Print Student Details">
-                    <Printer className="h-5 w-5" />
-                  </button>
-                  <button
                     onClick={onClose}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                     <X className="h-5 w-5" />
@@ -115,251 +76,133 @@ export default function StudentDetails({
             </div>
 
             {/* Content */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-              {/* Print Content - Hidden but used for printing */}
-              <div id="student-details-print" className="hidden print:block">
-                <div className="header">
-                  <div className="student-name">
-                    {student.firstName}{' '}
-                    {student.middleName ? `${student.middleName} ` : ''}
-                    {student.lastName}
-                  </div>
-                  <div className="student-info">Student Details Report</div>
-                </div>
+            <div className="p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Personal Information */}
+              <Section
+                title="Personal Information"
+                icon={<User className="h-5 w-5 text-indigo-600" />}>
+                <Info label="First Name" value={student.firstName} />
+                {student.middleName && (
+                  <Info label="Middle Name" value={student.middleName} />
+                )}
+                <Info label="Last Name" value={student.lastName} />
+                <Info
+                  label="Date of Birth"
+                  value={formatDate(student.dateOfBirth)}
+                />
+                <Info label="Birth Place" value={student.birthPlace} />
+                <Info label="Gender" value={student.gender} />
+                <Info label="Nationality" value={student.nationality} />
+              </Section>
 
-                <div className="section">
-                  <div className="section-title">Personal Information</div>
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <span className="label">First Name:</span>
-                      <span className="value">{student.firstName}</span>
-                    </div>
-                    {student.middleName && (
-                      <div className="info-item">
-                        <span className="label">Middle Name:</span>
-                        <span className="value">{student.middleName}</span>
-                      </div>
-                    )}
-                    <div className="info-item">
-                      <span className="label">Last Name:</span>
-                      <span className="value">{student.lastName}</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Date of Birth:</span>
-                      <span className="value">
-                        {formatDate(student.dateOfBirth)}
-                      </span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Gender:</span>
-                      <span className="value">
-                        {student.gender || 'Not specified'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              {/* Academic Information */}
+              <Section
+                title="Academic Information"
+                icon={<Book className="h-5 w-5 text-purple-600" />}>
+                <Info label="Student ID" value={student.studentId} />
+                <Info label="Register Number" value={student.registerNumber} />
+                <Info label="Roll Number" value={student.rollNumber} />
+                <Info label="Grade" value={`Grade ${student.grade}`} />
+                <Info label="Division" value={`Division ${student.division}`} />
+                <Info
+                  label="Admission Date"
+                  value={formatDate(student.admissionDate)}
+                />
+                {student.previousSchoolName && (
+                  <Info
+                    label="Previous School"
+                    value={student.previousSchoolName}
+                  />
+                )}
+              </Section>
 
-                <div className="section">
-                  <div className="section-title">Academic Information</div>
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <span className="label">Roll Number:</span>
-                      <span className="value">{student.rollNumber}</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Grade:</span>
-                      <span className="value">Grade {student.grade}</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Division:</span>
-                      <span className="value">Division {student.division}</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Student ID:</span>
-                      <span className="value">{student._id}</span>
-                    </div>
-                  </div>
-                </div>
+              {/* Family Information */}
+              <Section
+                title="Family Information"
+                icon={<Users className="h-5 w-5 text-green-600" />}>
+                <Info label="Father's Name" value={student.fatherName} />
+                <Info label="Mother's Name" value={student.motherName} />
+              </Section>
 
-                <div className="section">
-                  <div className="section-title">Family Information</div>
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <span className="label">Father's Name:</span>
-                      <span className="value">{student.fatherName}</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Mother's Name:</span>
-                      <span className="value">{student.motherName}</span>
-                    </div>
-                  </div>
-                </div>
+              {/* Identification & Religion */}
+              <Section
+                title="Identity & Background"
+                icon={<IdCard className="h-5 w-5 text-orange-600" />}>
+                <Info label="Aadhaar" value={student.adhaar} />
+                <Info label="Caste" value={student.cast} />
+                <Info label="Religion" value={student.religion} />
+              </Section>
 
-                <div className="section">
-                  <div className="section-title">Contact Information</div>
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <span className="label">Phone:</span>
-                      <span className="value">{student.contactNumber}</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="label">Address:</span>
-                      <span className="value">{student.address}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Contact Information */}
+              <Section
+                title="Contact Information"
+                icon={<Phone className="h-5 w-5 text-blue-600" />}>
+                <Info label="Phone" value={student.contactNumber} />
+                <Info label="Address" value={student.address} multiline />
+              </Section>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Personal Information */}
-                <div className="bg-gray-50 rounded-xl p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <User className="h-5 w-5 text-indigo-600" />
-                    Personal Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">First Name:</span>
-                      <span className="font-medium text-gray-900">
-                        {student.firstName}
-                      </span>
-                    </div>
-                    {student.middleName && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Middle Name:</span>
-                        <span className="font-medium text-gray-900">
-                          {student.middleName}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Last Name:</span>
-                      <span className="font-medium text-gray-900">
-                        {student.lastName}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Date of Birth:</span>
-                      <span className="font-medium text-gray-900">
-                        {formatDate(student.dateOfBirth)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Gender:</span>
-                      <span className="font-medium text-gray-900 capitalize">
-                        {student.gender || 'Not specified'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              {/* Custom Fields */}
+              {student.customFields && student.customFields.length > 0 && (
+                <Section
+                  title="Additional Information"
+                  icon={<FileText className="h-5 w-5 text-gray-600" />}>
+                  {student.customFields.map((field, idx) => (
+                    <Info key={idx} label={field.key} value={field.value} />
+                  ))}
+                </Section>
+              )}
+            </div>
 
-                {/* Academic Information */}
-                <div className="bg-gray-50 rounded-xl p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Book className="h-5 w-5 text-purple-600" />
-                    Academic Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Roll Number:</span>
-                      <span className="font-medium text-gray-900">
-                        {student.rollNumber}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Grade:</span>
-                      <span className="font-medium text-gray-900">
-                        Grade {student.grade}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Division:</span>
-                      <span className="font-medium text-gray-900">
-                        Division {student.division}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Student ID:</span>
-                      <span className="font-medium text-gray-900 text-xs">
-                        {student._id}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Family Information */}
-                <div className="bg-gray-50 rounded-xl p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-600" />
-                    Family Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Father's Name:</span>
-                      <span className="font-medium text-gray-900">
-                        {student.fatherName}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Mother's Name:</span>
-                      <span className="font-medium text-gray-900">
-                        {student.motherName}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information */}
-                <div className="bg-gray-50 rounded-xl p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-blue-600" />
-                    Contact Information
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Phone:</span>
-                      <span className="font-medium text-gray-900">
-                        {student.contactNumber}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Address:</span>
-                      <span className="font-medium text-gray-900 text-right max-w-xs">
-                        {student.address}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-200">
-                <button
-                  onClick={handlePrint}
-                  className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
-                  <Printer className="h-4 w-4" />
-                  Print Document
-                </button>
-                <button
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-                  onClick={() => {
-                    console.log('Edit student:', student._id);
-                  }}>
-                  <Edit className="h-4 w-4" />
-                  Edit Student
-                </button>
-                <button
-                  className="px-4 py-2 bg-white text-black rounded-lg hover:bg-red-600 hover:text-white transition-colors flex items-center gap-2"
-                  onClick={() => {
-                    handleDelete;
-                  }}>
-                  <Trash className="h-4 w-4" />
-                  Delete
-                </button>
-              </div>
+            {/* Footer actions */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-white flex justify-end gap-3 flex-shrink-0">
+              <StudentDetailFooter student={student} />
             </div>
           </div>
         </div>
       </div>
     </>
+  );
+}
+
+/* ---------- Helpers ---------- */
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-gray-50 rounded-xl p-5">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        {icon}
+        {title}
+      </h3>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function Info({
+  label,
+  value,
+  multiline,
+}: {
+  label: string;
+  value: any;
+  multiline?: boolean;
+}) {
+  return (
+    <div className="flex justify-between items-start gap-4">
+      <span className="text-gray-600">{label}:</span>
+      <span
+        className={`font-medium text-gray-900 ${
+          multiline ? 'text-right max-w-xs' : ''
+        }`}>
+        {value || '—'}
+      </span>
+    </div>
   );
 }

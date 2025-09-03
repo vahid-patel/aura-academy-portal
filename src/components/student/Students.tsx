@@ -9,35 +9,48 @@ import StudentsList from './StudentsList';
 import EmptyState from './EmptyState';
 import AddStudentModal from './AddStudentModal';
 import StudentDetails from './StudentsDetails';
-import StudentsPagination from './StudentsPagination';
 
 interface StudentsProps {
   schoolId: string;
-  students: Student[];
-  error: string | null;
-  loading: boolean;
-  onRefresh: () => void;
-  onPageChange?: (page: number) => void;
 }
 
-export default function Students({
-  schoolId,
-  students,
-  error,
-  loading,
-  onRefresh,
-  onPageChange,
-}: StudentsProps) {
+export default function Students({ schoolId }: StudentsProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [students, setStudents] = useState<Student[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [Loading, setIsLoading] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<string>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [studentsPerPage] = useState(20);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchStudents = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const response = await studentAPI.getStudent(schoolId);
+      console.log('Fetched students');
+      setStudents(response.data.data);
+    } catch (err: any) {
+      if (err.response?.status === 404) {
+        setStudents([]);
+      } else {
+        console.log('Error fetching students:', err.message);
+        setError(err.message || 'Failed to fetch students');
+      }
+    }
+    setIsLoading(false);
+  }, [schoolId]);
+
+  const onRefresh = () => {
+    fetchStudents();
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   const filteredStudents = useMemo(() => {
     return students.filter((student) => {
@@ -57,36 +70,10 @@ export default function Students({
     });
   }, [students, searchTerm, selectedGrade, selectedDivision]);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedGrade, selectedDivision]);
-
-  // Get current students for pagination
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
-  );
-
-  // Debug pagination calculations
-  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
-  console.log('Pagination Debug:', {
-    filteredStudentsLength: filteredStudents.length,
-    studentsPerPage,
-    currentPage,
-    totalPages,
-    indexOfFirstStudent,
-    indexOfLastStudent,
-    currentStudentsLength: currentStudents.length,
-  });
-
   const handleClearFilters = () => {
     setSearchTerm('');
     setSelectedGrade('all');
     setSelectedDivision('all');
-    setCurrentPage(1); // Reset to first page when clearing filters
   };
 
   const handleStudentClick = (student: Student) => {
@@ -97,15 +84,6 @@ export default function Students({
   const handleCloseDetails = () => {
     setIsDetailsOpen(false);
     setSelectedStudent(null);
-  };
-
-  const handlePageChange = (page: number) => {
-    console.log('handlePageChange called with page:', page);
-    console.log('Current page before update:', currentPage);
-    setCurrentPage(page);
-    // Notify parent component (Dashboard) about page change
-    onPageChange?.(page);
-    console.log('setCurrentPage called with:', page);
   };
 
   // Trigger file input on "Upload CSV"
@@ -122,11 +100,10 @@ export default function Students({
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('schoolId', schoolId); // send schoolId
+    formData.append('schoolId', schoolId);
 
     try {
       const response = await studentAPI.uploadCSV(formData);
-      onRefresh();
       alert(
         `${
           response.data.summary.saved || 'Some'
@@ -142,7 +119,7 @@ export default function Students({
     event.target.value = '';
   };
 
-  if (loading) {
+  if (Loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -190,16 +167,8 @@ export default function Students({
         <>
           <StudentsList
             students={students}
-            filteredStudents={currentStudents}
+            filteredStudents={filteredStudents}
             onStudentClick={handleStudentClick}
-          />
-
-          <StudentsPagination
-            currentPage={currentPage}
-            totalPages={Math.ceil(filteredStudents.length / studentsPerPage)}
-            totalItems={filteredStudents.length}
-            itemsPerPage={studentsPerPage}
-            onPageChange={handlePageChange}
           />
         </>
       ) : (
@@ -215,8 +184,7 @@ export default function Students({
         onClose={() => setIsFormOpen(false)}
         onSuccess={() => {
           setIsFormOpen(false);
-          onRefresh();
-          setCurrentPage(1); // Reset to first page after adding new student
+          fetchStudents();
         }}
         onCancel={() => setIsFormOpen(false)}
       />

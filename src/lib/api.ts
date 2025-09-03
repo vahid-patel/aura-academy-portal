@@ -1,7 +1,6 @@
 import { CreateSchoolFormData } from '@/components/admin/CreateSchoolModal';
 import axios from 'axios';
 
-// Create axios instance with default config
 const api = axios.create({
   baseURL: 'http://localhost:4000',
   headers: {
@@ -44,8 +43,7 @@ export const studentAPI = {
     api.post('/student/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  getStudent: (schoolId: string, page: number) =>
-    api.get(`/student/${schoolId}?page=${page}`),
+  getStudent: (schoolId: string) => api.get(`/student/${schoolId}`),
   getStudentById: (id: string) => api.get(`/student/${id}`),
   updateStudent: (id: string, studentData: any) =>
     api.patch(`/student/${id}`, studentData),
@@ -55,13 +53,28 @@ export const studentAPI = {
 export const teacherAPI = {
   createTeacher: (teacherData: any) => api.post('/user', teacherData),
 
-  getTeacherBySchoolId: (schoolId: string) =>
-    api.get(`/user/teachers/${schoolId}`),
+  getTeachers: (schoolId: string) => api.get(`/user/teachers/${schoolId}`),
 
   updateTeacher: (id: string, teacherData: any) =>
     api.patch(`/user/${id}`, teacherData),
 
   deleteTeacher: (id: string) => api.delete(`/user/${id}`),
+};
+
+interface certificateData {
+  schoolId: string;
+  templateCode: string;
+  name: string;
+}
+export const certificateAPI = {
+  createCertificate: (data: certificateData) => api.post(`/certificate/`, data),
+
+  getCertificates: (schoolId: string) => api.get(`/certificate/${schoolId}`),
+
+  generateCertificate: (studentId: string, certificateId: string) =>
+    api.get(`/certificate/${studentId}/${certificateId}`),
+
+  getCertificateById: (id: string) => api.get(`/certificate/${id}`),
 };
 
 export default api;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { GraduationCap } from 'lucide-react';
 import { LoginForm } from './LoginForm';
@@ -13,14 +13,11 @@ interface AuthModalProps {
 
 export const AuthModal = ({ type, onClose }: AuthModalProps) => {
   const [open, setOpen] = useState(true);
-  const location = useLocation();
   const navigate = useNavigate();
   const { openAuthModal } = useModalStore();
 
   useEffect(() => {
-    // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
-
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -28,18 +25,18 @@ export const AuthModal = ({ type, onClose }: AuthModalProps) => {
 
   const handleClose = () => {
     setOpen(false);
-    // Small delay to allow modal close animation
     setTimeout(onClose, 200);
   };
 
   const handleSuccess = () => {
-    const from = location.state?.from?.pathname || '/dashboard';
-    navigate(from, { replace: true }); // ✅ now works
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user?.role === 'admin' || user?.role === 'super_admin') {
+      navigate('/admin/control-panel', { replace: true });
+    }
   };
 
   return (
     <>
-      {/* Background overlay with blur */}
       <div className="fixed inset-0 z-40 bg-gradient-subtle backdrop-blur-md" />
 
       <Dialog open={open} onOpenChange={handleClose}>
@@ -47,7 +44,9 @@ export const AuthModal = ({ type, onClose }: AuthModalProps) => {
           <DialogHeader className="text-center pb-6">
             <div className="flex items-center justify-center gap-2 mb-4">
               <GraduationCap className="h-8 w-8 text-purple-primary" />
-              <span className="text-2xl font-bold hero-text">Aura Academy</span>
+              <span className="text-2xl font-bold hero-text">
+                Edu Management
+              </span>
             </div>
           </DialogHeader>
 

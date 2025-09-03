@@ -18,7 +18,7 @@ export interface Teacher {
   updatedAt: string; // ISO string
 }
 
-export const createTeacherSchema = z.object({
+export const teacherSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters long'),
@@ -27,8 +27,8 @@ export const createTeacherSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export type CreateTeacherRequest = z.infer<typeof createTeacherSchema>;
+export type TeacherFormData = z.infer<typeof teacherSchema>;
 
-export interface UpdateTeacherRequest extends Partial<CreateTeacherRequest> {
+export interface UpdateTeacherRequest extends Partial<TeacherFormData> {
   id: string;
 }

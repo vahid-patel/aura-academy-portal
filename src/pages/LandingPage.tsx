@@ -6,78 +6,72 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  GraduationCap,
-  Users,
-  BookOpen,
-  BarChart3,
-  Shield,
-  Zap,
-} from 'lucide-react';
+
+import { GraduationCap } from 'lucide-react';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { useModalStore } from '@/lib/modalStore';
-
+import { features } from '@/assets/Features';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 const LandingPage = () => {
   const { authModal, openAuthModal, closeAuthModal } = useModalStore();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const navigate = useNavigate();
 
-  const features = [
-    {
-      icon: Users,
-      title: 'User Management',
-      description:
-        'Efficiently manage teachers and staff with role-based access control.',
-    },
-    {
-      icon: BookOpen,
-      title: 'Student Records',
-      description:
-        'Maintain comprehensive student profiles with academic and personal data.',
-    },
-    {
-      icon: BarChart3,
-      title: 'Analytics Dashboard',
-      description:
-        'Get insights into school performance with detailed analytics and reports.',
-    },
-    {
-      icon: Shield,
-      title: 'Secure & Reliable',
-      description:
-        'Enterprise-grade security to keep your school data safe and protected.',
-    },
-    {
-      icon: Zap,
-      title: 'Easy Integration',
-      description:
-        'Seamlessly integrate with existing school systems and workflows.',
-    },
-    {
-      icon: GraduationCap,
-      title: 'Academic Excellence',
-      description: 'Tools designed to promote and track academic achievement.',
-    },
-  ];
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setIsAuthenticated(true);
+      setUserData(JSON.parse(user));
+    }
+  }, []);
+
+  const handleDashboardClick = () => {
+    console.log(userData);
+    if (userData?.schoolId) {
+      navigate(`/dashboard`);
+    } else if (userData?.role === 'admin' || userData?.role === 'super_admin') {
+      navigate('/admin/control-panel');
+    }
+  };
+
+  const renderAuthButtons = () => {
+    if (isAuthenticated) {
+      return (
+        <Button
+          variant="gradient"
+          onClick={handleDashboardClick}
+          className="flex items-center gap-2">  
+          Go to Dashboard
+        </Button>
+      );
+    }
+
+    return (
+      <div className="flex gap-3">
+        <Button variant="ghost" onClick={() => openAuthModal('login')}>
+          Login
+        </Button>
+        <Button variant="gradient" onClick={() => openAuthModal('signup')}>
+          Get Started
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      {/* Navigation Header */}
       <header className="border-b border-purple-primary/20 backdrop-blur-sm bg-white/80">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <GraduationCap className="h-8 w-8 text-purple-primary" />
-              <span className="text-2xl font-bold hero-text">Aura Academy</span>
+              <span className="text-2xl font-bold hero-text">
+                Edu Management
+              </span>
             </div>
-            <div className="flex gap-3">
-              <Button variant="ghost" onClick={() => openAuthModal('login')}>
-                Login
-              </Button>
-              <Button
-                variant="gradient"
-                onClick={() => openAuthModal('signup')}>
-                Get Started
-              </Button>
-            </div>
+            {renderAuthButtons()}
           </div>
         </div>
       </header>
@@ -154,7 +148,7 @@ const LandingPage = () => {
             Ready to Transform Your School?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join hundreds of schools already using Aura Academy to streamline
+            Join hundreds of schools already using Edu Management to streamline
             their operations
           </p>
           <Button
@@ -172,10 +166,10 @@ const LandingPage = () => {
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <GraduationCap className="h-6 w-6 text-purple-primary" />
-            <span className="text-xl font-bold hero-text">Aura Academy</span>
+            <span className="text-xl font-bold hero-text">Edu Management</span>
           </div>
           <p className="text-muted-foreground">
-            © 2024 Aura Academy. Empowering education through technology.
+            © 2024 Edu Management. Empowering education through technology.
           </p>
         </div>
       </footer>

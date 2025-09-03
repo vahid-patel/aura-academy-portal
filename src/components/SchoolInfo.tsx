@@ -1,12 +1,17 @@
 // components/SchoolInfo.tsx
-import { Home, MapPin, GraduationCap, Users } from 'lucide-react';
+import { useState } from 'react';
+import { Home, MapPin, GraduationCap, Users, Plus } from 'lucide-react';
 import { School as SchoolType } from '@/types/school';
+import { Button } from './ui/button';
+import CertificateForm from './CertificateForm'; // <-- import the form
 
 interface SchoolInfoProps {
   school: SchoolType;
 }
 
 export default function SchoolInfo({ school }: SchoolInfoProps) {
+  const [showCertificateForm, setShowCertificateForm] = useState(false);
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">
@@ -59,7 +64,31 @@ export default function SchoolInfo({ school }: SchoolInfoProps) {
             </div>
           </div>
         </div>
+
+        {/* Add Certificate */}
+        <div className="flex items-center space-x-3">
+          <div>
+            <p className="text-sm text-gray-500">Add Certificate</p>
+            <Button
+              className="mt-2"
+              onClick={() => setShowCertificateForm(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Certificate
+            </Button>
+          </div>
+        </div>
       </div>
+
+      {/* Certificate Modal */}
+      {showCertificateForm && (
+        <CertificateForm
+          schoolId={school._id}
+          onClose={() => setShowCertificateForm(false)}
+          onSuccess={() => {
+            setShowCertificateForm(false);
+          }}
+        />
+      )}
     </div>
   );
 }
