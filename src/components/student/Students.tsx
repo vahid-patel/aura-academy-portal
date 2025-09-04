@@ -12,9 +12,13 @@ import StudentDetails from './StudentsDetails';
 
 interface StudentsProps {
   schoolId: string;
+  isTeacherView?: boolean;
 }
 
-export default function Students({ schoolId }: StudentsProps) {
+export default function Students({
+  schoolId,
+  isTeacherView = false,
+}: StudentsProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [students, setStudents] = useState<Student[]>([]);

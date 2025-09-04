@@ -15,9 +15,6 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AdminControlPanel = lazy(() => import('./pages/AdminControlPanel'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
-// Auth modals (non-lazy since they're small)
-import { AuthModal } from '@/components/auth/AuthModal';
-
 const queryClient = new QueryClient();
 
 // Loading component with full screen skeleton

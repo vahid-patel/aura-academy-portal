@@ -14,6 +14,7 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [documentList, setDocumentList] = useState<any[]>([]);
+  const [printingDocument, setPrintingDocument] = useState<string | null>(null);
 
   const fetchLogs = async () => {
     if (!student._id) {
@@ -77,7 +78,7 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
 
   const fetchStudentDocs = async (docId: string) => {
     let zplCode = '';
-    setLoadingLogs(true);
+    setPrintingDocument(docId);
     setError('');
     try {
       console.log('Fetching certificate for student...');
@@ -93,7 +94,7 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
         console.log('Error fetching certificate:', error.message);
         setError('Failed to fetch certificate.');
       }
-      setLoadingLogs(false);
+      setPrintingDocument(null);
       return;
     }
 
@@ -132,7 +133,7 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
       alert(error.message || 'An error occurred while generating the preview.');
     }
 
-    setLoadingLogs(false);
+    setPrintingDocument(null);
   };
 
   const handleDelete = () => {
@@ -185,9 +186,16 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
 
                   <button
                     onClick={() => fetchStudentDocs(doc._id)}
-                    className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1">
-                    <Printer className="h-4 w-4" />
-                    Print
+                    disabled={printingDocument === doc._id}
+                    className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] justify-center">
+                    {printingDocument === doc._id ? (
+                      <div className="h-4 w-4 border-2 border-white/30 border-t-white animate-spin rounded-full" />
+                    ) : (
+                      <>
+                        <Printer className="h-4 w-4" />
+                        Print
+                      </>
+                    )}
                   </button>
                 </div>
               ))}

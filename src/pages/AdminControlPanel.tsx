@@ -104,11 +104,6 @@ const AdminControlPanel = () => {
     }
   };
 
-  // const handleEditSchool = (school: SchoolType) => {
-  //   setSchoolToEdit(school);
-  //   setIsCreateModalOpen(true);
-  // };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',

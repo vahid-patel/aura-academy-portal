@@ -29,10 +29,10 @@ const LandingPage = () => {
 
   const handleDashboardClick = () => {
     console.log(userData);
-    if (userData?.schoolId) {
-      navigate(`/dashboard`);
-    } else if (userData?.role === 'admin' || userData?.role === 'super_admin') {
+    if (userData?.role === 'admin' || userData?.role === 'super_admin') {
       navigate('/admin/control-panel');
+    } else if (userData?.role === 'teacher' && userData?.schoolId) {
+      navigate(`/dashboard/${userData.schoolId}`);
     }
   };
 
@@ -42,7 +42,7 @@ const LandingPage = () => {
         <Button
           variant="gradient"
           onClick={handleDashboardClick}
-          className="flex items-center gap-2">  
+          className="flex items-center gap-2">
           Go to Dashboard
         </Button>
       );

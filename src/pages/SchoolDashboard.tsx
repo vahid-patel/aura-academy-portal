@@ -7,7 +7,6 @@ import { School } from '@/types/school';
 import { schoolAPI } from '@/lib/api';
 import Students from '@/components/student/Students';
 import Teachers from '@/components/teachers/Teachers';
-import { UserRole } from '@/types/teacher';
 
 const Dashboard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,8 +45,8 @@ const Dashboard: React.FC = () => {
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         onLogout={logout}
-        userRole={user?.role}
-      />{' '}
+      />
+
       <div className="flex-1 flex flex-col">
         <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-gray-200">
           <button
@@ -90,15 +89,8 @@ const Dashboard: React.FC = () => {
             </>
           )}
 
-          {activeTab === 'students' && (
-            <Students
-              schoolId={id!}
-              isTeacherView={user?.role === UserRole.TEACHER}
-            />
-          )}
-          {activeTab === 'teachers' && user?.role !== UserRole.TEACHER && (
-            <Teachers schoolId={id!} />
-          )}
+          {activeTab === 'students' && <Students schoolId={id!} />}
+          {activeTab === 'teachers' && <Teachers schoolId={id!} />}
         </main>
       </div>
     </div>

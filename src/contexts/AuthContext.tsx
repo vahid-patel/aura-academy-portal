@@ -8,11 +8,13 @@ import {
 import { authAPI } from '../lib/api';
 import { date } from 'zod';
 
+import { UserRole } from '@/types/teacher';
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: UserRole;
   schoolId?: string;
   schoolName?: string;
 }

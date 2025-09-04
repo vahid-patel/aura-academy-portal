@@ -37,6 +37,8 @@ export const AuthModal = ({ type, onClose }: AuthModalProps) => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user?.role === 'admin' || user?.role === 'super_admin') {
       navigate('/admin/control-panel', { replace: true });
+    } else if (user?.role === 'teacher' && user?.schoolId) {
+      navigate(`/dashboard/${user.schoolId}`, { replace: true });
     }
   };
 

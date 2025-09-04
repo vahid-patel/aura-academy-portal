@@ -9,13 +9,31 @@ interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   onLogout: () => void;
+  userRole?: 'super_admin' | 'admin' | 'sub_admin' | 'teacher';
 }
 
-const sidebarItems = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'students', label: 'Students', icon: GraduationCap },
-  { id: 'teachers', label: 'Teachers', icon: Users },
-];
+// Define items based on UserRole from teacher.ts
+const allSidebarItems = {
+  super_admin: [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'students', label: 'Students', icon: GraduationCap },
+    { id: 'teachers', label: 'Teachers', icon: Users },
+  ],
+  admin: [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'students', label: 'Students', icon: GraduationCap },
+    { id: 'teachers', label: 'Teachers', icon: Users },
+  ],
+  sub_admin: [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'students', label: 'Students', icon: GraduationCap },
+    { id: 'teachers', label: 'Teachers', icon: Users },
+  ],
+  teacher: [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'students', label: 'Students', icon: GraduationCap },
+  ],
+};
 
 export default function Sidebar({
   activeTab,
@@ -23,7 +41,9 @@ export default function Sidebar({
   sidebarOpen,
   setSidebarOpen,
   onLogout,
+  userRole = 'admin',
 }: SidebarProps) {
+  const sidebarItems = allSidebarItems[userRole];
   return (
     <div
       className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
