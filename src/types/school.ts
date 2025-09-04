@@ -4,14 +4,7 @@ export interface School {
   _id: string;
   name: string;
   address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  phone: string;
-  email: string;
   principalName: string;
-  website?: string;
-  establishedYear: number;
   totalStudents: number;
   totalTeachers: number;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';

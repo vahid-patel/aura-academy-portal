@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { GraduationCap } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
@@ -48,6 +53,11 @@ export const AuthModal = ({ type, onClose }: AuthModalProps) => {
                 Edu Management
               </span>
             </div>
+            <DialogTitle>
+              {type === 'login'
+                ? 'Sign In to Your Account'
+                : 'Create an Account'}
+            </DialogTitle>
           </DialogHeader>
 
           {type === 'login' ? (

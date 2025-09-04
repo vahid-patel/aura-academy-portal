@@ -77,4 +77,8 @@ export const certificateAPI = {
   getCertificateById: (id: string) => api.get(`/certificate/${id}`),
 };
 
+export const logsAPI = {
+  getLogs: (studentId: string) => api.get(`/logs/${studentId}`),
+};
+
 export default api;

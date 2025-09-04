@@ -1,4 +1,4 @@
-import api, { certificateAPI } from '@/lib/api';
+import api, { certificateAPI, logsAPI, studentAPI } from '@/lib/api';
 import { Student } from '@/types/student';
 import { Edit, Printer, Trash, FileText, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -15,11 +15,41 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [documentList, setDocumentList] = useState<any[]>([]);
 
+  const fetchLogs = async () => {
+    if (!student._id) {
+      setError('Student ID is missing.');
+      console.log('Student ID is missing.');
+      return;
+    }
+    setLoadingLogs(true);
+    setError('');
+    try {
+      console.log('Fetching logs for student:', student._id);
+      const response = await logsAPI.getLogs(student._id);
+      console.log('Fetched logs:', response.data.data);
+      setLogs(response.data.data || []);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        setLogs([]);
+      } else {
+        console.log('Error fetching logs:', error.message);
+        setError('Failed to fetch logs.');
+      }
+    }
+    setLoadingLogs(false);
+  };
+
   useEffect(() => {
     if (showDocuments) {
       fetchDocumentList();
     }
   }, [showDocuments]);
+
+  useEffect(() => {
+    if (showLogs) {
+      fetchLogs();
+    }
+  }, [showLogs]);
 
   const fetchDocumentList = async () => {
     if (!student._id) {
@@ -38,7 +68,7 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
       if (error.response?.status === 404) {
         setDocumentList([]);
       } else {
-        console.error('Error fetching documents:', error);
+        console.log('Error fetching documents:', error.message);
         setError('Failed to fetch documents.');
       }
     }
@@ -55,13 +85,12 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
         student._id!,
         docId
       );
-      // Backend returns ZPL code
-      zplCode = response.data;
+      zplCode = response.data.data;
     } catch (error: any) {
       if (error.response?.status === 404) {
-        setLogs([]);
+        setError('');
       } else {
-        console.error('Error fetching certificate:', error);
+        console.log('Error fetching certificate:', error.message);
         setError('Failed to fetch certificate.');
       }
       setLoadingLogs(false);
@@ -69,7 +98,6 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
     }
 
     try {
-      // Call Labelary API to render PNG preview
       const labelaryResponse = await fetch(
         'https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/',
         {
@@ -100,8 +128,8 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
         alert('Please allow pop-ups to preview the certificate.');
       }
     } catch (error: any) {
-      console.error('Error rendering certificate preview:', error.message);
-      alert('An error occurred while generating the preview.');
+      console.log('Error rendering certificate preview:', error.message);
+      alert(error.message || 'An error occurred while generating the preview.');
     }
 
     setLoadingLogs(false);
@@ -109,35 +137,6 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
 
   const handleDelete = () => {
     console.log('Delete student:', student._id);
-  };
-
-  const handlePrint = async (docId?: string) => {
-    if (!student._id) {
-      console.error('Student ID is missing.');
-      alert(
-        'Could not open certificate because the student ID is not available.'
-      );
-      return;
-    }
-
-    try {
-      const response = await api.post(`/certificate/${student._id}`, {
-        responseType: 'text',
-      });
-      const certificateHtml = response.data;
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-
-      if (printWindow) {
-        printWindow.document.body.innerHTML = certificateHtml;
-        printWindow.document.close();
-        printWindow.focus();
-      } else {
-        alert('Please allow pop-ups for this website to view the certificate.');
-      }
-    } catch (error) {
-      console.log('Error opening certificate:', error.message);
-      alert('An error occurred while trying to open the certificate.');
-    }
   };
 
   return (
@@ -166,7 +165,6 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
         Edit Student
       </button>
 
-      {/* Delete */}
       <button
         className="px-4 py-2 bg-white text-black rounded-lg hover:bg-red-600 hover:text-white transition-colors flex items-center gap-2"
         onClick={handleDelete}>
@@ -174,7 +172,6 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
         Delete
       </button>
 
-      {/* Documents Modal */}
       {showDocuments && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-[500px]">
@@ -211,7 +208,6 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
         </div>
       )}
 
-      {/* Logs Modal */}
       {showLogs && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-[600px]">
@@ -222,7 +218,7 @@ const StudentDetailFooter = ({ student }: StudentDetailFooterProps) => {
               <ul className="space-y-2">
                 {logs.map((log, idx) => (
                   <li key={idx} className="text-sm border-b pb-2">
-                    {log.action} - {new Date(log.date).toLocaleString()}
+                    {log.message} - {new Date(log.createdAt).toLocaleString()}
                   </li>
                 ))}
               </ul>

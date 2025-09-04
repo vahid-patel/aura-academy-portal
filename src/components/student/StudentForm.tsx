@@ -82,8 +82,6 @@ export default function AddStudentForm({
       setLoading(true);
       const parsedData = {
         ...result.data,
-        studentId: Number(result.data.studentId),
-        registerNumber: Number(result.data.registerNumber),
         rollNumber: Number(result.data.rollNumber),
         adhaar: Number(result.data.adhaar),
         grade: Number(result.data.grade),
@@ -91,10 +89,13 @@ export default function AddStudentForm({
         division:
           result.data.division in Divisions ? result.data.division : 'A',
       };
+      console.log('Submitting student data:', parsedData);
       const response = await addStudent.createStudent(parsedData);
       onSuccess();
     } catch (err) {
-      setErrors({ submit: 'Failed to add student. Please try again.' });
+      setErrors({
+        submit: err.message || 'Failed to add student. Please try again.',
+      });
     } finally {
       setLoading(false);
     }

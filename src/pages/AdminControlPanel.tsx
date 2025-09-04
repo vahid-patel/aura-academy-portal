@@ -19,10 +19,7 @@ import {
 import {
   School,
   Plus,
-  MapPin,
-  Mail,
   Phone,
-  Calendar,
   Edit,
   Trash2,
   LogOut,
@@ -34,6 +31,7 @@ import { School as SchoolType } from '@/types/school';
 import { useToast } from '@/hooks/use-toast';
 import { WelcomeBanner } from '@/components/WelcomeBanner';
 import { useNavigate } from 'react-router-dom';
+import { ProfileCard } from './ProfileCard';
 
 const AdminControlPanel = () => {
   const navigate = useNavigate();
@@ -42,6 +40,7 @@ const AdminControlPanel = () => {
   const [schools, setSchools] = useState<SchoolType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [schoolToEdit, setSchoolToEdit] = useState<SchoolType | null>(null);
 
   const fetchSchools = async () => {
     try {
@@ -66,6 +65,11 @@ const AdminControlPanel = () => {
   useEffect(() => {
     fetchSchools();
   }, []);
+
+  const handleEditSchool = (school: SchoolType) => {
+    setSchoolToEdit(school);
+    setIsCreateModalOpen(true);
+  };
 
   const handleDeleteSchool = async (schoolId: string) => {
     if (
@@ -100,20 +104,10 @@ const AdminControlPanel = () => {
     }
   };
 
-  const getStatusBadge = (status: SchoolType['status']) => {
-    const statusConfig = {
-      ACTIVE: 'bg-green-100 text-green-800 border-green-200',
-      INACTIVE: 'bg-red-100 text-red-800 border-red-200',
-      PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    };
-
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[status]}`}>
-        {status}
-      </span>
-    );
-  };
+  // const handleEditSchool = (school: SchoolType) => {
+  //   setSchoolToEdit(school);
+  //   setIsCreateModalOpen(true);
+  // };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -125,7 +119,6 @@ const AdminControlPanel = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      {/* Header */}
       <div className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -159,127 +152,144 @@ const AdminControlPanel = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <WelcomeBanner userName={user?.name || 'User'}></WelcomeBanner>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
+          <div className="md:col-span-4">
+            <ProfileCard user={user!} />
+          </div>
+          <div className="md:col-span-8">
+            {/* Schools Management */}
+            <Card className="shadow-elegant border-purple-primary/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <School className="h-5 w-5 text-purple-primary" />
+                      Schools Management
+                    </CardTitle>
+                    <CardDescription>
+                      Manage and monitor all educational institutions in your
+                      network
+                    </CardDescription>
+                  </div>
+                  <Button
+                    variant="gradient"
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add School
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-primary"></div>
+                  </div>
+                ) : schools.length === 0 ? (
+                  <div className="text-center py-12">
+                    <School className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      No schools found
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      Start by adding your first educational institution
+                    </p>
+                    <Button
+                      variant="gradient"
+                      onClick={() => setIsCreateModalOpen(true)}
+                      className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add Your First School
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>School Name</TableHead>
+                          <TableHead>Principal</TableHead>
+                          <TableHead>Contact</TableHead>
 
-        {/* Schools Management */}
-        <Card className="shadow-elegant border-purple-primary/20">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <School className="h-5 w-5 text-purple-primary" />
-                  Schools Management
-                </CardTitle>
-                <CardDescription>
-                  Manage and monitor all educational institutions in your
-                  network
-                </CardDescription>
-              </div>
-              <Button
-                variant="gradient"
-                onClick={() => setIsCreateModalOpen(true)}
-                className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add School
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-primary"></div>
-              </div>
-            ) : schools.length === 0 ? (
-              <div className="text-center py-12">
-                <School className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No schools found</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start by adding your first educational institution
-                </p>
-                <Button
-                  variant="gradient"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Your First School
-                </Button>
-              </div>
-            ) : (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>School Name</TableHead>
-                      <TableHead>Principal</TableHead>
-                      <TableHead>Contact</TableHead>
+                          <TableHead>Address</TableHead>
+                          <TableHead>Created</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {schools.map((school) => (
+                          <TableRow key={school._id}>
+                            <TableCell
+                              className="cursor-pointer hover:bg-purple-50"
+                              onClick={() =>
+                                navigate(`/dashboard/${school._id}`)
+                              }>
+                              <div>
+                                <div className="font-medium">{school.name}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium">
+                                {school.principalName}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="text-sm flex items-center gap-1">
+                                  <Phone className="h-3 w-3" />
+                                  {school.contactNumber}
+                                </div>
+                              </div>
+                            </TableCell>
 
-                      <TableHead>Address</TableHead>
-                      <TableHead>Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schools.map((school) => (
-                      <TableRow key={school._id}>
-                        <TableCell
-                          className="cursor-pointer hover:bg-purple-50"
-                          onClick={() => navigate(`/dashboard/${school._id}`)}>
-                          <div>
-                            <div className="font-medium">{school.name}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium">
-                            {school.principalName}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="text-sm flex items-center gap-1">
-                              <Phone className="h-3 w-3" />
-                              {school.contactNumber}
-                            </div>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>{school.address}</TableCell>
-                        <TableCell>
-                          <div className="text-sm text-muted-foreground">
-                            {formatDate(school.createdAt)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-purple-primary">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                              onClick={() => handleDeleteSchool(school._id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                            <TableCell>{school.address}</TableCell>
+                            <TableCell>
+                              <div className="text-sm text-muted-foreground">
+                                {formatDate(school.createdAt)}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-purple-primary"
+                                  onClick={() => handleEditSchool(school)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                  onClick={() =>
+                                    handleDeleteSchool(school._id)
+                                  }>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
       <CreateSchoolModal
         open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
+        onOpenChange={(open) => {
+          setIsCreateModalOpen(open);
+          if (!open) setSchoolToEdit(null);
+        }}
         onSchoolCreated={fetchSchools}
         adminId={user?.id}
+        schoolToEdit={schoolToEdit || undefined}
+        isEditing={!!schoolToEdit}
       />
     </div>
   );

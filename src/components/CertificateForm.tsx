@@ -38,7 +38,6 @@ export default function CertificateForm({
         name: title,
         templateCode,
       });
-      console.log('Response from create certificate', response);
       if (!response.data.success) {
         setError(response.data.message);
         return;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,14 +25,17 @@ import { schoolAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { createSchoolSchema } from '@/types/school';
 
-// ✅ Schema aligned with backend
-export type CreateSchoolFormData = z.infer<typeof createSchoolSchema>;
+export type CreateSchoolFormData = z.infer<typeof createSchoolSchema> & {
+  _id?: string;
+};
 
 interface CreateSchoolModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSchoolCreated?: () => void;
-  adminId: string;
+  onSchoolCreated: () => void;
+  adminId: string | undefined;
+  schoolToEdit?: CreateSchoolFormData;
+  isEditing?: boolean;
 }
 
 export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
@@ -40,9 +43,11 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
   onOpenChange,
   onSchoolCreated,
   adminId,
+  schoolToEdit,
+  isEditing = false,
 }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CreateSchoolFormData>({
     resolver: zodResolver(createSchoolSchema),
@@ -52,26 +57,50 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
       address: '',
       contactNumber: '',
       isActive: true,
-      adminId: adminId,
+      adminId: adminId || '',
     },
   });
+
+  // ✅ Reset form values whenever modal opens or schoolToEdit changes
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        name: schoolToEdit?.name || '',
+        principalName: schoolToEdit?.principalName || '',
+        address: schoolToEdit?.address || '',
+        contactNumber: schoolToEdit?.contactNumber || '',
+        isActive: schoolToEdit?.isActive ?? true,
+        adminId: adminId || '',
+      });
+
+      if (schoolToEdit) {
+        console.log('Editing school:', schoolToEdit.name);
+      }
+    }
+  }, [open, schoolToEdit, adminId, form]);
 
   const onSubmit = async (data: CreateSchoolFormData) => {
     setIsSubmitting(true);
     try {
-      await schoolAPI.createSchool(data);
-      toast({
-        title: 'Success',
-        description: 'School created successfully!',
-      });
-
-      form.reset();
-      onOpenChange(false);
-      onSchoolCreated?.();
+      if (isEditing && schoolToEdit?._id) {
+        await schoolAPI.updateSchool(schoolToEdit._id, data);
+        toast({
+          title: 'Success',
+          description: 'School updated successfully',
+        });
+      } else {
+        await schoolAPI.createSchool(data);
+        toast({
+          title: 'Success',
+          description: 'School created successfully',
+        });
+      }
+      onSchoolCreated();
+      handleClose();
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Failed to create school',
+        description: error.response?.data?.message || 'Something went wrong',
         variant: 'destructive',
       });
     } finally {
@@ -88,9 +117,13 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create New School</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Edit School' : 'Create New School'}
+          </DialogTitle>
           <DialogDescription>
-            Add a new school under your administration.
+            {isEditing
+              ? 'Modify the details of the school.'
+              : 'Add a new school under your administration.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -177,7 +210,13 @@ export const CreateSchoolModal: React.FC<CreateSchoolModalProps> = ({
                 Cancel
               </Button>
               <Button type="submit" variant="gradient" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create School'}
+                {isSubmitting
+                  ? isEditing
+                    ? 'Updating...'
+                    : 'Creating...'
+                  : isEditing
+                  ? 'Update School'
+                  : 'Create School'}
               </Button>
             </DialogFooter>
           </form>

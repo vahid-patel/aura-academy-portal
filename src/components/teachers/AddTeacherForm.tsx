@@ -61,7 +61,7 @@ export default function AddTeacherForm({
       }
       onSuccess();
     } catch (err) {
-      console.error('Failed to add teacher:', err);
+      console.log('Failed to add teacher:', err);
       if (err instanceof Error) {
         setErrors({ submit: err.message });
       } else {

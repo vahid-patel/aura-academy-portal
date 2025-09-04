@@ -1,15 +1,21 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home, AlertCircle } from "lucide-react";
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Home, AlertCircle } from 'lucide-react';
 
 const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
+    console.log(
+      '404 Error: User attempted to access non-existent route:',
       location.pathname
     );
   }, [location.pathname]);
@@ -28,9 +34,11 @@ const NotFound = () => {
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p className="text-muted-foreground">
-            The page <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
+            The page{' '}
+            <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
               {location.pathname}
-            </span> could not be found.
+            </span>{' '}
+            could not be found.
           </p>
           <Button variant="gradient" asChild className="w-full">
             <a href="/">
